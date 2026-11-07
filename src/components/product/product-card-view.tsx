@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ProductImageCarousel } from "@/components/product-image-carousel";
+import { ProductImageCarousel } from "@/components/product/product-image-carousel";
 
 const MAX_SWATCHES = 5;
 

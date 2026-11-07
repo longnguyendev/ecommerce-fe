@@ -1,4 +1,4 @@
-import { Catalog } from "@/components/catalog";
+import { Catalog } from "@/components/product/catalog";
 import { fetchAllProducts } from "@/lib/storefront/api";
 
 export const dynamic = "force-dynamic";

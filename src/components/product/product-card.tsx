@@ -1,4 +1,4 @@
-import { ProductCardView } from "@/components/product-card-view";
+import { ProductCardView } from "@/components/product/product-card-view";
 import { colorName, formatPrice, SWATCH_HEX, type Product } from "@/lib/catalog";
 
 export function ProductCard({ product }: { product: Product }) {

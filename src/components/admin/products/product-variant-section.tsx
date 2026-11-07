@@ -1,5 +1,6 @@
 "use client";
 
+import { slugify } from "@/lib/slugify";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,16 +70,6 @@ function comboKey(opts: { attributeId: string; value: string }[]): string {
     .map((o) => `${o.attributeId}:${o.value}`)
     .sort()
     .join("|");
-}
-
-function slugify(text: string): string {
-  return text
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/đ/gi, "d")
-    .replace(/[^a-zA-Z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .toUpperCase();
 }
 
 /** Tích Descartes các option -> danh sách tổ hợp biến thể. */

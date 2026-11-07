@@ -1,17 +1,11 @@
 import Image from "next/image";
+import { SectionHeading } from "@/components/shared/section-heading";
 import { INSTAGRAM } from "@/data/home";
 
 export function ShopTheLook() {
   return (
     <section className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <div className="mb-4 flex items-end justify-between">
-        <h2 className="text-[11px] font-normal uppercase tracking-[0.05em] text-[#767676]">
-          Shop the Look
-        </h2>
-        <span className="text-[11px] font-normal uppercase tracking-[0.05em] text-[#767676]">
-          OXI on You
-        </span>
-      </div>
+      <SectionHeading title="Shop the Look" aside="OXI on You" />
 
       <div className="no-bar -mx-4 flex gap-[2px] overflow-x-auto px-4 pb-2 snap-x snap-mandatory">
         {INSTAGRAM.map((card) => (

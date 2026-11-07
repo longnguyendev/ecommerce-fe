@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AdminHeader } from "@/components/admin/admin-header";
-import { ProductImagesSection } from "@/components/admin/product-images-section";
+import { AdminShell } from "@/components/admin/admin-shell";
+import { Field, RowActions, selectClass, textareaClass, DataTable } from "@/components/admin/form-controls";
+import { slugify } from "@/lib/slugify";
+import { ProductImagesSection } from "@/components/admin/products/product-images-section";
 import {
   ProductVariantSection,
   type DraftResult,
-} from "@/components/admin/product-variant-section";
+} from "@/components/admin/products/product-variant-section";
 import {
   gql,
   isAuthenticated,
@@ -21,15 +23,6 @@ import {
 } from "@/lib/admin/client";
 
 const PAGE_SIZE = 20;
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
 
 export function ProductManager() {
   const router = useRouter();
@@ -239,23 +232,17 @@ export function ProductManager() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f4f4]">
-      <AdminHeader />
-
-      <main className="mx-auto max-w-[1200px] px-4 py-8 sm:px-6">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-medium tracking-tight">
-              Quản lý sản phẩm
-            </h1>
-            <p className="mt-1 text-[13px] text-muted-foreground">
-              {total} sản phẩm · trang {page + 1}/{totalPages}
-            </p>
-          </div>
-          <Button onClick={openCreate} className="h-11 rounded-none text-xs uppercase tracking-[0.1em]">
-            + Thêm sản phẩm
-          </Button>
-        </div>
+    <AdminShell
+      title="Quản lý sản phẩm"
+      subtitle={`${total} sản phẩm · trang ${page + 1}/${totalPages}`}
+      maxWidth="1200px"
+      error={error}
+      action={
+        <Button onClick={openCreate} className="h-11 rounded-none text-xs uppercase tracking-[0.1em]">
+          + Thêm sản phẩm
+        </Button>
+      }
+    >
 
         <div className="mb-4 flex items-center gap-2">
           <div className="relative w-full max-w-md">
@@ -285,12 +272,6 @@ export function ProductManager() {
           ) : null}
         </div>
 
-        {error ? (
-          <p className="mb-4 border border-destructive/40 bg-destructive/10 px-4 py-3 text-[13px] text-destructive">
-            {error}
-          </p>
-        ) : null}
-
         {showForm ? (
           <div className="mb-6 space-y-6">
             <form
@@ -301,10 +282,7 @@ export function ProductManager() {
                 {editingId ? "Sửa sản phẩm" : "Thêm sản phẩm"}
               </h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-1.5 block text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
-                  Tên sản phẩm *
-                </label>
+              <Field label="Tên sản phẩm *">
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -312,27 +290,21 @@ export function ProductManager() {
                   className="rounded-none"
                   placeholder="Sculpt - Black (Đen) - Bra"
                 />
-              </div>
-              <div>
-                <label className="mb-1.5 block text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
-                  Slug (bỏ trống để tự sinh)
-                </label>
+              </Field>
+              <Field label="Slug (bỏ trống để tự sinh)">
                 <Input
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   className="rounded-none"
                   placeholder="sculpt-black-den-bra"
                 />
-              </div>
-              <div>
-                <label className="mb-1.5 block text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
-                  Danh mục *
-                </label>
+              </Field>
+              <Field label="Danh mục *">
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                   required
-                  className="h-9 w-full rounded-none border border-border bg-background px-3 text-[13px] outline-none focus:border-foreground"
+                  className={selectClass}
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -340,33 +312,27 @@ export function ProductManager() {
                     </option>
                   ))}
                 </select>
-              </div>
-              <div className="sm:col-span-2">
-                <label className="mb-1.5 block text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
-                  Mô tả
-                </label>
+              </Field>
+              <Field label="Mô tả" className="sm:col-span-2">
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
-                  className="w-full rounded-none border border-border bg-background px-3 py-2 text-[13px] outline-none focus:border-foreground"
+                  className={textareaClass}
                   placeholder="Mô tả sản phẩm…"
                 />
-              </div>
-              <div>
-                <label className="mb-1.5 block text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
-                  Trạng thái
-                </label>
+              </Field>
+              <Field label="Trạng thái">
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as ProductStatus)}
-                  className="h-9 w-full rounded-none border border-border bg-background px-3 text-[13px] outline-none focus:border-foreground"
+                  className={selectClass}
                 >
                   <option value="DRAFT">Draft</option>
                   <option value="ACTIVE">Active</option>
                   <option value="ARCHIVED">Archived</option>
                 </select>
-              </div>
+              </Field>
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
@@ -402,18 +368,15 @@ export function ProductManager() {
           </div>
         ) : null}
 
-        <div className="overflow-x-auto rounded-lg border border-border bg-background">
-          <table className="w-full text-left text-[13px]">
-            <thead>
-              <tr className="border-b border-border text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
-                <th className="px-4 py-3 font-normal">Sản phẩm</th>
-                <th className="px-4 py-3 font-normal">Danh mục</th>
-                <th className="px-4 py-3 font-normal">Giá</th>
-                <th className="px-4 py-3 font-normal">Trạng thái</th>
-                <th className="px-4 py-3 text-right font-normal">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
+        <DataTable
+          columns={[
+            { label: "Sản phẩm" },
+            { label: "Danh mục" },
+            { label: "Giá" },
+            { label: "Trạng thái" },
+            { label: "Thao tác", right: true },
+          ]}
+        >
               {products.map((p) => (
                 <tr key={p.id} className="border-b border-border last:border-0">
                   <td className="px-4 py-3">
@@ -451,30 +414,15 @@ export function ProductManager() {
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEdit(p)}
-                        className="h-7 rounded-none text-[11px]"
-                      >
-                        Sửa / Biến thể
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => onDelete(p)}
-                        className="h-7 rounded-none text-[11px]"
-                      >
-                        Xoá
-                      </Button>
-                    </div>
+                    <RowActions
+                      editLabel="Sửa / Biến thể"
+                      onEdit={() => openEdit(p)}
+                      onDelete={() => onDelete(p)}
+                    />
                   </td>
                 </tr>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </DataTable>
 
         {!busy && products.length === 0 ? (
           <p className="py-10 text-center text-[13px] text-muted-foreground">
@@ -509,7 +457,6 @@ export function ProductManager() {
             Sau →
           </Button>
         </div>
-      </main>
-    </div>
+    </AdminShell>
   );
 }

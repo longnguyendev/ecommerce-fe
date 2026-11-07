@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ProductDetail } from "@/components/product-detail";
-import { ProductCard } from "@/components/product-card";
+import { ProductDetail } from "@/components/product/product-detail";
+import { ProductGrid } from "@/components/product/product-grid";
+import { SectionHeading } from "@/components/shared/section-heading";
 import { kindOf } from "@/lib/catalog";
 import { fetchAllProducts, fetchProductDetail } from "@/lib/storefront/api";
 
@@ -49,16 +50,8 @@ export default async function ProductPage({
 
       {related.length ? (
         <section className="mt-20">
-          <div className="border-b border-border pb-2.5">
-            <h2 className="text-[10.5px] uppercase tracking-[0.18em]">
-              Có thể bạn thích
-            </h2>
-          </div>
-          <div className="mt-6 grid grid-cols-2 gap-x-2.5 gap-y-8 sm:gap-x-4 lg:grid-cols-4">
-            {related.map((p) => (
-              <ProductCard key={p.slug} product={p} />
-            ))}
-          </div>
+          <SectionHeading title="Có thể bạn thích" variant="line" />
+          <ProductGrid products={related} className="mt-6" />
         </section>
       ) : null}
     </div>
