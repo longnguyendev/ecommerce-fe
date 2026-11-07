@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Pagination, SearchInput } from "@/components/admin/list-controls";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Field, RowActions, selectClass, textareaClass, DataTable } from "@/components/admin/form-controls";
 import { slugify } from "@/lib/slugify";
@@ -244,33 +245,12 @@ export function ProductManager() {
       }
     >
 
-        <div className="mb-4 flex items-center gap-2">
-          <div className="relative w-full max-w-md">
-            <Input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tìm sản phẩm theo tên…"
-              aria-label="Tìm sản phẩm theo tên"
-              className="h-10 rounded-none bg-background pr-9"
-            />
-            {search ? (
-              <button
-                type="button"
-                onClick={() => setSearch("")}
-                aria-label="Xoá tìm kiếm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-1 text-[16px] leading-none text-muted-foreground hover:text-foreground"
-              >
-                ×
-              </button>
-            ) : null}
-          </div>
-          {query ? (
-            <span className="text-[12.5px] text-muted-foreground">
-              {total} kết quả cho “{query}”
-            </span>
-          ) : null}
-        </div>
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Tìm sản phẩm theo tên…"
+          summary={query ? `${total} kết quả cho “${query}”` : undefined}
+        />
 
         {showForm ? (
           <div className="mb-6 space-y-6">
@@ -436,27 +416,7 @@ export function ProductManager() {
           </p>
         ) : null}
 
-        <div className="mt-4 flex items-center justify-between">
-          <Button
-            variant="outline"
-            disabled={page === 0}
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            className="h-9 rounded-none text-xs"
-          >
-            ← Trước
-          </Button>
-          <span className="text-[12px] text-muted-foreground">
-            Trang {page + 1} / {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            disabled={page >= totalPages - 1}
-            onClick={() => setPage((p) => p + 1)}
-            className="h-9 rounded-none text-xs"
-          >
-            Sau →
-          </Button>
-        </div>
+        <Pagination page={page} totalPages={totalPages} onChange={setPage} />
     </AdminShell>
   );
 }

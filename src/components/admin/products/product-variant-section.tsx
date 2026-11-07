@@ -1,156 +1,28 @@
 "use client";
 
-import { slugify } from "@/lib/slugify";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { ValueCombobox } from "@/components/admin/products/value-combobox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { slugify } from "@/lib/slugify";
 import { gql, resolveImageUrl, uploadImage } from "@/lib/admin/client";
+import {
+  buildCombos,
+  comboKey,
+  DEFAULT_COMBO,
+  formatVnd,
+  resolveRow,
+  VARIANT_FIELDS,
+  type Attribute,
+  type Combo,
+  type DraftResult,
+  type DraftVariant,
+  type Option,
+  type RowData,
+  type Variant,
+} from "@/components/admin/products/variant-logic";
 
-interface Attribute {
-  id: string;
-  name: string;
-  values: { id: string; value: string }[];
-}
-interface VariantAttr {
-  attribute: { id: string; name: string };
-  attributeValue: { id: string; value: string };
-}
-interface Variant {
-  id: string;
-  sku: string;
-  price: number;
-  compareAtPrice: number | null;
-  stockQuantity: number;
-  isActive: boolean;
-  attributes: VariantAttr[];
-  images: { url: string }[];
-}
-
-/** Một thuộc tính đang dùng + danh sách giá trị (text) của nó. */
-interface Option {
-  attributeId: string;
-  values: string[];
-  draft: string;
-}
-interface RowData {
-  sku: string;
-  price: string;
-  stock: string;
-  /** Ảnh đại diện của biến thể (URL), "" = không có. */
-  image: string;
-}
-interface Combo {
-  key: string;
-  label: string;
-  options: { attributeId: string; value: string }[];
-}
-
-const FIELDS = `
-  id sku price compareAtPrice stockQuantity isActive
-  attributes { attribute { id name } attributeValue { id value } }
-  images { url }
-`;
-
-const DEFAULT_KEY = "__default__";
-
-export interface DraftVariant {
-  sku: string;
-  price: number;
-  stockQuantity: number;
-  isActive: boolean;
-  imageUrl: string | null;
-  options: { attributeId: string; value: string }[];
-}
-/** Kết quả dựng biến thể để lưu (dùng cho chế độ tạo sản phẩm mới). */
-export type DraftResult = { variants: DraftVariant[] } | { error: string };
-
-function comboKey(opts: { attributeId: string; value: string }[]): string {
-  if (opts.length === 0) return DEFAULT_KEY;
-  return opts
-    .map((o) => `${o.attributeId}:${o.value}`)
-    .sort()
-    .join("|");
-}
-
-/** Tích Descartes các option -> danh sách tổ hợp biến thể. */
-function buildCombos(options: Option[]): Combo[] {
-  const active = options.filter((o) => o.attributeId && o.values.length > 0);
-  if (active.length === 0) return [];
-  let acc: { attributeId: string; value: string }[][] = [[]];
-  for (const opt of active) {
-    acc = acc.flatMap((prefix) =>
-      opt.values.map((value) => [
-        ...prefix,
-        { attributeId: opt.attributeId, value },
-      ]),
-    );
-  }
-  return acc.map((opts) => ({
-    key: comboKey(opts),
-    label: opts.map((o) => o.value).join(" / "),
-    options: opts,
-  }));
-}
-
-const EMPTY_ROW: RowData = { sku: "", price: "", stock: "0", image: "" };
-
-/**
- * Lấy dữ liệu dòng cho một tổ hợp. Nếu chưa có dòng khớp chính xác (vì vừa thêm/bớt
- * thuộc tính làm đổi khoá tổ hợp), kế thừa từ dòng cũ gần nhất:
- * - dòng cũ có các phần là tập con của tổ hợp mới (thêm thuộc tính) -> giữ giá/tồn,
- *   SKU thêm hậu tố giá trị mới để không trùng;
- * - dòng cũ là tập cha của tổ hợp mới (bớt thuộc tính) -> giữ nguyên dòng đầu tiên.
- */
-function resolveRow(rows: Record<string, RowData>, combo: Combo): RowData {
-  const exact = rows[combo.key];
-  if (exact) return exact;
-
-  const parts = new Set(combo.key.split("|"));
-  let best: { key: string; size: number } | null = null;
-  let superset: string | null = null;
-
-  for (const k of Object.keys(rows)) {
-    if (k === DEFAULT_KEY) continue;
-    const oldParts = k.split("|");
-    if (oldParts.every((x) => parts.has(x))) {
-      if (!best || oldParts.length > best.size) {
-        best = { key: k, size: oldParts.length };
-      }
-    } else if (!superset && combo.key !== DEFAULT_KEY) {
-      const oldSet = new Set(oldParts);
-      if ([...parts].every((x) => oldSet.has(x))) superset = k;
-    }
-  }
-
-  if (best) {
-    const old = rows[best.key];
-    const oldSet = new Set(best.key.split("|"));
-    const extra = combo.options
-      .filter((o) => !oldSet.has(`${o.attributeId}:${o.value}`))
-      .map((o) => o.value)
-      .join(" ");
-    return {
-      ...old,
-      sku: old.sku && extra ? `${old.sku}-${slugify(extra)}` : old.sku,
-    };
-  }
-  if (superset) return rows[superset];
-  if (rows[DEFAULT_KEY]) {
-    return { ...rows[DEFAULT_KEY], sku: "" };
-  }
-  return EMPTY_ROW;
-}
-
-function formatVnd(v: string): string {
-  const n = Number(v);
-  return Number.isFinite(n) && v !== "" ? `${n.toLocaleString("vi-VN")} đ` : "";
-}
-
-const DEFAULT_COMBO: Combo = {
-  key: DEFAULT_KEY,
-  label: "Mặc định",
-  options: [],
-};
+export type { DraftResult, DraftVariant };
 
 /**
  * - Có `productId`: sửa sản phẩm đã tồn tại, lưu qua nút "Lưu biến thể".
@@ -191,7 +63,7 @@ export function ProductVariantSection({
       const varData = await gql<{ productVariants: { nodes: Variant[] } }>(
         `query Variants($pid: ID!) {
           productVariants(pagination: { take: 100 }, filter: { productId: $pid }) {
-            nodes { ${FIELDS} }
+            nodes { ${VARIANT_FIELDS} }
           }
         }`,
         { pid: productId },
@@ -682,84 +554,3 @@ export function ProductVariantSection({
   );
 }
 
-/**
- * Ô nhập giá trị: bấm vào để chọn từ các giá trị có sẵn của thuộc tính, hoặc gõ chữ mới
- * rồi Enter / chọn "Tạo mới" để thêm giá trị chưa có.
- */
-function ValueCombobox({
-  draft,
-  open,
-  suggestions,
-  onOpen,
-  onClose,
-  onDraftChange,
-  onPick,
-}: {
-  draft: string;
-  open: boolean;
-  suggestions: string[];
-  onOpen: () => void;
-  onClose: () => void;
-  onDraftChange: (draft: string) => void;
-  onPick: (value: string) => void;
-}) {
-  const typed = draft.trim();
-  const exact = suggestions.some((v) => v.toLowerCase() === typed.toLowerCase());
-
-  return (
-    <div className="relative">
-      <Input
-        value={draft}
-        placeholder="Chọn hoặc nhập giá trị mới"
-        onFocus={onOpen}
-        onBlur={onClose}
-        onChange={(e) => {
-          onDraftChange(e.target.value);
-          onOpen();
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            if (typed) onPick(typed);
-          } else if (e.key === "Escape") {
-            onClose();
-          }
-        }}
-        className="h-9 rounded text-[13px]"
-      />
-      {open && (suggestions.length > 0 || (typed && !exact)) ? (
-        <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded border border-border bg-background py-1 text-[13px] shadow-md">
-          {suggestions.map((v) => (
-            <li key={v}>
-              <button
-                type="button"
-                // mousedown + preventDefault: chọn xong trước khi ô nhập mất focus
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  onPick(v);
-                }}
-                className="block w-full px-3 py-1.5 text-left hover:bg-muted"
-              >
-                {v}
-              </button>
-            </li>
-          ))}
-          {typed && !exact ? (
-            <li>
-              <button
-                type="button"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  onPick(typed);
-                }}
-                className="block w-full border-t border-border px-3 py-1.5 text-left text-blue-600 hover:bg-muted"
-              >
-                + Tạo mới “{typed}”
-              </button>
-            </li>
-          ) : null}
-        </ul>
-      ) : null}
-    </div>
-  );
-}
