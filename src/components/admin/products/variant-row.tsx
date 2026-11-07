@@ -1,10 +1,6 @@
+import { formatVnd, type Combo, type RowData } from "@/components/admin/products/variant-logic";
 import { Input } from "@/components/ui/input";
 import { resolveImageUrl } from "@/lib/admin/client";
-import {
-  formatVnd,
-  type Combo,
-  type RowData,
-} from "@/components/admin/products/variant-logic";
 
 export function VariantRow({
   combo,

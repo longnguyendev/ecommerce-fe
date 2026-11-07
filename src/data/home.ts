@@ -20,9 +20,29 @@ export const ACTIVITY_TILES = [
 ];
 
 export const INSTAGRAM = [
-  { image: "/images/instagram/f5d90fdc63b1aa18.jpg", handle: "@huynnnhnhu", caption: "yoga day in my fav cream fit 🤍" },
-  { image: "/images/instagram/3ab2e9470bef8d39.jpg", handle: "@vananhscarlet", caption: "Starting the month strong 💪" },
-  { image: "/images/instagram/b17a05fc63a10d50.jpg", handle: "@tu_hhao", caption: "in my tennis girl era 🎾" },
-  { image: "/images/instagram/86fd4077b67e64f6.jpg", handle: "@_hatmitmit_", caption: "Serving Valentine energy all day in our Celebre Collection ❤️" },
-  { image: "/images/instagram/5624583597062e9b.jpg", handle: "@hmeuu", caption: "Doing my stretches, drinking my water, keeping my day quiet." },
+  {
+    image: "/images/instagram/f5d90fdc63b1aa18.jpg",
+    handle: "@huynnnhnhu",
+    caption: "yoga day in my fav cream fit 🤍",
+  },
+  {
+    image: "/images/instagram/3ab2e9470bef8d39.jpg",
+    handle: "@vananhscarlet",
+    caption: "Starting the month strong 💪",
+  },
+  {
+    image: "/images/instagram/b17a05fc63a10d50.jpg",
+    handle: "@tu_hhao",
+    caption: "in my tennis girl era 🎾",
+  },
+  {
+    image: "/images/instagram/86fd4077b67e64f6.jpg",
+    handle: "@_hatmitmit_",
+    caption: "Serving Valentine energy all day in our Celebre Collection ❤️",
+  },
+  {
+    image: "/images/instagram/5624583597062e9b.jpg",
+    handle: "@hmeuu",
+    caption: "Doing my stretches, drinking my water, keeping my day quiet.",
+  },
 ];

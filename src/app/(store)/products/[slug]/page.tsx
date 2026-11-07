@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
 import { ProductDetail } from "@/components/product/product-detail";
 import { ProductGrid } from "@/components/product/product-grid";
 import { SectionHeading } from "@/components/shared/section-heading";
@@ -42,9 +43,7 @@ export default async function ProductPage({
         product={detail.product}
         variants={detail.variants}
         initialColor={
-          detail.variants.some((v) => v.color === colorParam)
-            ? (colorParam ?? null)
-            : null
+          detail.variants.some((v) => v.color === colorParam) ? (colorParam ?? null) : null
         }
       />
 

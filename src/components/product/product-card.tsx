@@ -39,9 +39,7 @@ export function ProductCard({ product }: { product: Product }) {
       images={product.images}
       badge={product.badge}
       discountPercent={
-        product.compareAt
-          ? Math.round((1 - product.price / product.compareAt) * 100)
-          : null
+        product.compareAt ? Math.round((1 - product.price / product.compareAt) * 100) : null
       }
       priceText={formatPrice(product.price)}
       compareAtText={product.compareAt ? formatPrice(product.compareAt) : null}

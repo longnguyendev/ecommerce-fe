@@ -62,7 +62,11 @@ function parseColor(input?: string): { r: number; g: number; b: number } | null 
   const hex = s.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
   if (hex) {
     let h = hex[1];
-    if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+    if (h.length === 3)
+      h = h
+        .split("")
+        .map((c) => c + c)
+        .join("");
     return {
       r: parseInt(h.slice(0, 2), 16),
       g: parseInt(h.slice(2, 4), 16),
@@ -128,9 +132,7 @@ export function colorNamesOf(products: Product[]) {
       seen.set(n, (seen.get(n) || 0) + 1);
     }
   }
-  return [...seen.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([name, count]) => ({ name, count }));
+  return [...seen.entries()].sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
 }
 
 /* --------------------------------------------------------------- helpers */

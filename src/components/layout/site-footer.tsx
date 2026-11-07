@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -72,9 +73,7 @@ export function SiteFooter() {
             <h4 className="mb-6 text-[11px] font-normal uppercase tracking-[0.2em] text-foreground">
               Kết nối
             </h4>
-            <p className="mb-4 text-[13px] text-[#767676]">
-              Nhận thông tin mới nhất
-            </p>
+            <p className="mb-4 text-[13px] text-[#767676]">Nhận thông tin mới nhất</p>
             <form className="flex max-w-md flex-col sm:flex-row">
               <Input
                 type="email"
@@ -102,7 +101,10 @@ export function SiteFooter() {
           <span className="text-[#d0d0d0]">|</span>
           <div className="inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.1em]">
             <span>Ngôn ngữ:</span>
-            <button type="button" className="font-medium underline underline-offset-2 text-foreground">
+            <button
+              type="button"
+              className="font-medium underline underline-offset-2 text-foreground"
+            >
               Tiếng Việt
             </button>
             <span className="text-[#d0d0d0]">/</span>
@@ -165,7 +167,9 @@ export function SiteFooter() {
         <Separator className="bg-border" />
 
         <div className="flex flex-wrap items-center justify-center gap-6 pt-6 pb-4 sm:gap-8">
-          <span className="flex items-center gap-1.5 text-xs text-[#767676]">Thanh toán an toàn</span>
+          <span className="flex items-center gap-1.5 text-xs text-[#767676]">
+            Thanh toán an toàn
+          </span>
           <span className="flex items-center gap-1.5 text-xs text-[#767676]">Chính hãng 100%</span>
           <span className="flex items-center gap-1.5 text-xs text-[#767676]">Đổi hàng dễ dàng</span>
         </div>
@@ -173,9 +177,7 @@ export function SiteFooter() {
         <Separator className="bg-border" />
 
         <div className="flex flex-col items-center justify-between gap-4 pt-6 sm:flex-row">
-          <p className="text-xs text-[#767676]">
-            © 2026 OXI Apparel. Đã đăng ký bản quyền.
-          </p>
+          <p className="text-xs text-[#767676]">© 2026 OXI Apparel. Đã đăng ký bản quyền.</p>
           <div className="flex items-center gap-4 text-xs text-[#767676]">
             <Link href="/privacy" className="transition-opacity hover:opacity-70">
               Chính sách bảo mật

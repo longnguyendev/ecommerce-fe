@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { gql, setTokens, type AdminUser } from "@/lib/admin/client";
@@ -81,9 +82,7 @@ export default function AdminLoginPage() {
             />
           </div>
 
-          {error ? (
-            <p className="text-[12px] text-destructive">{error}</p>
-          ) : null}
+          {error ? <p className="text-[12px] text-destructive">{error}</p> : null}
 
           <Button
             type="submit"

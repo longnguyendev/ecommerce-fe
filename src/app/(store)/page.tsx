@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Hero } from "@/components/home/hero";
+
 import { CollectionTiles } from "@/components/home/collection-tiles";
+import { Hero } from "@/components/home/hero";
+import { ShopTheLook } from "@/components/home/shop-the-look";
 import { ProductGrid } from "@/components/product/product-grid";
 import { SectionHeading } from "@/components/shared/section-heading";
-import { ShopTheLook } from "@/components/home/shop-the-look";
 import { Button } from "@/components/ui/button";
 import { fetchAllProducts } from "@/lib/storefront/api";
 

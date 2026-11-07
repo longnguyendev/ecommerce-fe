@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Field, FormCard, RowActions } from "@/components/admin/form-controls";
 import { Badge } from "@/components/ui/badge";
@@ -39,9 +40,7 @@ export function AttributeManager() {
   const [name, setName] = useState("");
   const [values, setValues] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [newValueByAttr, setNewValueByAttr] = useState<Record<string, string>>(
-    {},
-  );
+  const [newValueByAttr, setNewValueByAttr] = useState<Record<string, string>>({});
 
   function reset() {
     setName("");
@@ -93,10 +92,7 @@ export function AttributeManager() {
   async function deleteValue(v: AttributeValue) {
     if (!window.confirm(`Xoá giá trị "${v.value}"?`)) return;
     await run(async () => {
-      await gql(
-        `mutation DeleteValue($id: ID!) { deleteAttributeValue(id: $id) }`,
-        { id: v.id },
-      );
+      await gql(`mutation DeleteValue($id: ID!) { deleteAttributeValue(id: $id) }`, { id: v.id });
     }, "Xoá giá trị thất bại");
   }
 
@@ -142,18 +138,10 @@ export function AttributeManager() {
 
       <div className="space-y-4">
         {attributes.map((a) => (
-          <div
-            key={a.id}
-            className="rounded-lg border border-border bg-background p-4"
-          >
+          <div key={a.id} className="rounded-lg border border-border bg-background p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[13px] uppercase tracking-[0.1em]">
-                {a.name}
-              </h2>
-              <RowActions
-                onEdit={() => openEdit(a)}
-                onDelete={() => deleteAttr(a)}
-              />
+              <h2 className="text-[13px] uppercase tracking-[0.1em]">{a.name}</h2>
+              <RowActions onEdit={() => openEdit(a)} onDelete={() => deleteAttr(a)} />
             </div>
             <div className="flex flex-wrap gap-2">
               {a.values.map((v) => (

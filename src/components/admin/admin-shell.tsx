@@ -34,11 +34,7 @@ export function AdminShell({
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-medium tracking-tight">{title}</h1>
-            {subtitle ? (
-              <p className="mt-1 text-[13px] text-muted-foreground">
-                {subtitle}
-              </p>
-            ) : null}
+            {subtitle ? <p className="mt-1 text-[13px] text-muted-foreground">{subtitle}</p> : null}
           </div>
           {action}
         </div>

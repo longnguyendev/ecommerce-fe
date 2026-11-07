@@ -3,20 +3,15 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
-import { isLocalImage } from "@/lib/image-url";
 import { formatPrice, type Product } from "@/lib/catalog";
+import { isLocalImage } from "@/lib/image-url";
 import { colorHex, type StoreVariant } from "@/lib/storefront/api";
 
 const FALLBACK_SIZES = ["S", "M", "L", "XL"];
 
-function Accordion({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="border-b border-border">
@@ -30,9 +25,7 @@ function Accordion({
         <span className="text-muted-foreground">{open ? "−" : "+"}</span>
       </button>
       {open ? (
-        <div className="pb-4 text-[13px] leading-relaxed text-muted-foreground">
-          {children}
-        </div>
+        <div className="pb-4 text-[13px] leading-relaxed text-muted-foreground">{children}</div>
       ) : null}
     </div>
   );
@@ -72,9 +65,7 @@ export function ProductDetail({
   const selectedVariant = useMemo(
     () =>
       variants.find(
-        (v) =>
-          (hasSize ? v.size === size : true) &&
-          (hasColor ? v.color === color : true),
+        (v) => (hasSize ? v.size === size : true) && (hasColor ? v.color === color : true),
       ),
     [variants, size, color, hasSize, hasColor],
   );
@@ -87,9 +78,7 @@ export function ProductDetail({
 
   // Gallery theo màu đang chọn (như thẻ sản phẩm); màu chưa có ảnh riêng -> ảnh chung.
   const gallery =
-    colorOption && colorOption.images.length > 0
-      ? colorOption.images
-      : product.images;
+    colorOption && colorOption.images.length > 0 ? colorOption.images : product.images;
   const stock = selectedVariant?.stockQuantity;
 
   const swatches = hasColor
@@ -162,9 +151,7 @@ export function ProductDetail({
         <div className="mt-2.5 flex items-center gap-3">
           <p className="text-[17px]">{formatPrice(price)}</p>
           {compareAt ? (
-            <p className="text-[13px] text-[#999] line-through">
-              {formatPrice(compareAt)}
-            </p>
+            <p className="text-[13px] text-[#999] line-through">{formatPrice(compareAt)}</p>
           ) : null}
           {stock !== undefined && stock <= 5 ? (
             <p className="text-[11px] text-[#999]">Còn {stock} sản phẩm</p>
@@ -221,9 +208,7 @@ export function ProductDetail({
             ))}
           </div>
           {error ? (
-            <p className="mt-2 text-[12px] text-destructive">
-              Vui lòng chọn đầy đủ size / màu
-            </p>
+            <p className="mt-2 text-[12px] text-destructive">Vui lòng chọn đầy đủ size / màu</p>
           ) : null}
         </div>
 

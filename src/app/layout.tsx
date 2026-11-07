@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -11,8 +12,7 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: "OXI Apparel",
-  description:
-    "Bản clone cục bộ oxi-apparel.com — Next.js + shadcn/ui (storefront + admin).",
+  description: "Bản clone cục bộ oxi-apparel.com — Next.js + shadcn/ui (storefront + admin).",
 };
 
 export default function RootLayout({

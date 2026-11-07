@@ -1,15 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Announcement } from "./announcement";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+
+import { Announcement } from "./announcement";
 
 function Icon({
   name,
@@ -108,12 +104,8 @@ export function SiteHeader() {
               </span>
             </label>
 
-            <span className="hidden text-[11.5px] tracking-wide text-foreground lg:block">
-              EN
-            </span>
-            <span className="hidden text-[13px] text-foreground lg:block">
-              Về chúng tôi
-            </span>
+            <span className="hidden text-[11.5px] tracking-wide text-foreground lg:block">EN</span>
+            <span className="hidden text-[13px] text-foreground lg:block">Về chúng tôi</span>
             <span className="hidden text-foreground sm:block" aria-hidden="true">
               <Icon name="heart" size={18} />
             </span>

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+
 import { isAuthenticated } from "@/lib/admin/client";
 
 /** Chuyển về trang đăng nhập nếu chưa có token; gọi `onReady` khi đã đăng nhập. */

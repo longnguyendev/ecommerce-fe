@@ -58,9 +58,7 @@ export interface DraftVariant {
 /** Kết quả dựng biến thể để lưu (dùng cho chế độ tạo sản phẩm mới). */
 export type DraftResult = { variants: DraftVariant[] } | { error: string };
 
-export function comboKey(
-  opts: { attributeId: string; value: string }[],
-): string {
+export function comboKey(opts: { attributeId: string; value: string }[]): string {
   if (opts.length === 0) return DEFAULT_KEY;
   return opts
     .map((o) => `${o.attributeId}:${o.value}`)
@@ -75,10 +73,7 @@ export function buildCombos(options: Option[]): Combo[] {
   let acc: { attributeId: string; value: string }[][] = [[]];
   for (const opt of active) {
     acc = acc.flatMap((prefix) =>
-      opt.values.map((value) => [
-        ...prefix,
-        { attributeId: opt.attributeId, value },
-      ]),
+      opt.values.map((value) => [...prefix, { attributeId: opt.attributeId, value }]),
     );
   }
   return acc.map((opts) => ({
@@ -97,10 +92,7 @@ export const EMPTY_ROW: RowData = { sku: "", price: "", stock: "0", image: "" };
  *   SKU thêm hậu tố giá trị mới để không trùng;
  * - dòng cũ là tập cha của tổ hợp mới (bớt thuộc tính) -> giữ nguyên dòng đầu tiên.
  */
-export function resolveRow(
-  rows: Record<string, RowData>,
-  combo: Combo,
-): RowData {
+export function resolveRow(rows: Record<string, RowData>, combo: Combo): RowData {
   const exact = rows[combo.key];
   if (exact) return exact;
 

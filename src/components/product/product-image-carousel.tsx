@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
-import { isLocalImage } from "@/lib/image-url";
-
-import Link from "next/link";
 import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+
 import { Badge } from "@/components/ui/badge";
+import { isLocalImage } from "@/lib/image-url";
 
 /**
  * Vùng ảnh của thẻ sản phẩm: hover hiện nút chuyển ảnh và thanh tiến trình ở dưới

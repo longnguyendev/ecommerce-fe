@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { clearToken } from "@/lib/admin/client";
 
@@ -52,11 +53,7 @@ export function AdminHeader() {
           >
             Xem storefront
           </Button>
-          <Button
-            variant="ghost"
-            onClick={logout}
-            className="h-9 rounded-none text-xs"
-          >
+          <Button variant="ghost" onClick={logout} className="h-9 rounded-none text-xs">
             Đăng xuất
           </Button>
         </div>

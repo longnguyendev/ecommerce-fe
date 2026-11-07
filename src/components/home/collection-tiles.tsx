@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+
 import { ACTIVITY_TILES } from "@/data/home";
 
 export function CollectionTiles() {

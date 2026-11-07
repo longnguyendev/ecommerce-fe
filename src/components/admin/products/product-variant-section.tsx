@@ -1,12 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { VariantOptionsEditor } from "@/components/admin/products/variant-options-editor";
-import { VariantRow } from "@/components/admin/products/variant-row";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { slugify } from "@/lib/slugify";
-import { gql, uploadImage } from "@/lib/admin/client";
+
 import {
   buildCombos,
   comboKey,
@@ -21,6 +16,12 @@ import {
   type RowData,
   type Variant,
 } from "@/components/admin/products/variant-logic";
+import { VariantOptionsEditor } from "@/components/admin/products/variant-options-editor";
+import { VariantRow } from "@/components/admin/products/variant-row";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { gql, uploadImage } from "@/lib/admin/client";
+import { slugify } from "@/lib/slugify";
 
 export type { DraftResult, DraftVariant };
 
@@ -104,28 +105,20 @@ export function ProductVariantSection({
     void load();
   }, [load]);
 
-  const combos = useMemo(
-    () => (hasVariants ? buildCombos(options) : []),
-    [hasVariants, options],
-  );
+  const combos = useMemo(() => (hasVariants ? buildCombos(options) : []), [hasVariants, options]);
 
   const usedAttributeIds = options.map((o) => o.attributeId);
   const canAddOption = attributes.some((a) => !usedAttributeIds.includes(a.id));
 
   function patchOption(index: number, patch: Partial<Option>) {
     setSaved(false);
-    setOptions((prev) =>
-      prev.map((o, i) => (i === index ? { ...o, ...patch } : o)),
-    );
+    setOptions((prev) => prev.map((o, i) => (i === index ? { ...o, ...patch } : o)));
   }
 
   function addOption() {
     const next = attributes.find((a) => !usedAttributeIds.includes(a.id));
     if (!next) return;
-    setOptions((prev) => [
-      ...prev,
-      { attributeId: next.id, values: [], draft: "" },
-    ]);
+    setOptions((prev) => [...prev, { attributeId: next.id, values: [], draft: "" }]);
   }
 
   function removeOption(index: number) {
@@ -220,30 +213,21 @@ export function ProductVariantSection({
       return { error: "Thêm ít nhất một giá trị cho thuộc tính." };
     }
     // Tạo mới + không biến thể + chưa nhập giá -> tạo sản phẩm chưa có giá bán.
-    if (
-      !productId &&
-      !hasVariants &&
-      resolveRow(rows, DEFAULT_COMBO).price === ""
-    ) {
+    if (!productId && !hasVariants && resolveRow(rows, DEFAULT_COMBO).price === "") {
       return { variants: [] };
     }
 
-    const prefix = (
-      productId ? productId.slice(0, 6) : skuPrefix || "SKU"
-    ).toUpperCase();
+    const prefix = (productId ? productId.slice(0, 6) : skuPrefix || "SKU").toUpperCase();
 
     const variants: DraftVariant[] = [];
     for (const c of list) {
       const r = resolveRow(rows, c);
       if (r.price === "") {
         return {
-          error: c.label
-            ? `Nhập giá cho biến thể ${c.label}`
-            : "Nhập giá sản phẩm",
+          error: c.label ? `Nhập giá cho biến thể ${c.label}` : "Nhập giá sản phẩm",
         };
       }
-      const sku =
-        r.sku.trim() || `${prefix}${c.label ? "-" + slugify(c.label) : ""}`;
+      const sku = r.sku.trim() || `${prefix}${c.label ? "-" + slugify(c.label) : ""}`;
       variants.push({
         sku,
         price: Number(r.price),
@@ -303,8 +287,7 @@ export function ProductVariantSection({
           onChange={(e) => toggleHasVariants(e.target.checked)}
           className="h-4 w-4"
         />
-        Sản phẩm này có nhiều biến thể. Ví dụ như khác nhau về kích thước, màu
-        sắc.
+        Sản phẩm này có nhiều biến thể. Ví dụ như khác nhau về kích thước, màu sắc.
       </label>
 
       {error ? (
@@ -352,13 +335,7 @@ export function ProductVariantSection({
                 placeholder="Tồn cho tất cả"
                 className="h-8 w-36 rounded text-[12.5px]"
               />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={applyBulk}
-                className="h-8"
-              >
+              <Button type="button" variant="outline" size="sm" onClick={applyBulk} className="h-8">
                 Áp dụng
               </Button>
             </div>
@@ -386,9 +363,7 @@ export function ProductVariantSection({
           <div className="flex items-center gap-3">
             {productId ? (
               <>
-                {saved ? (
-                  <span className="text-[12px] text-green-600">Đã lưu</span>
-                ) : null}
+                {saved ? <span className="text-[12px] text-green-600">Đã lưu</span> : null}
                 <Button
                   type="button"
                   onClick={save}

@@ -1,17 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ProductCard } from "./product-card";
+
 import {
   colorName,
+  colorNamesOf,
   formatPrice,
   kindOf,
-  colorNamesOf,
   kindsOf,
   priceMax,
   SWATCH_HEX,
   type Product,
 } from "@/lib/catalog";
+
+import { ProductCard } from "./product-card";
 
 const SORTS = [
   { value: "featured", label: "Nổi bật" },
@@ -40,11 +42,16 @@ function Group({
   return (
     <details open={defaultOpen} className="group border-b border-border py-3.5">
       <summary className="flex cursor-pointer list-none items-center justify-between">
-        <span className="text-[10.5px] uppercase tracking-[0.16em] text-foreground">
-          {title}
-        </span>
+        <span className="text-[10.5px] uppercase tracking-[0.16em] text-foreground">{title}</span>
         <span className="text-muted-foreground transition-transform group-open:rotate-180">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
             <path d="m6 9 6 6 6-6" />
           </svg>
         </span>
@@ -95,9 +102,7 @@ export function Catalog({ products }: { products: Product[] }) {
   const sidebar = (
     <div>
       <div className="flex items-center justify-between pb-1">
-        <span className="text-[10.5px] uppercase tracking-[0.16em] text-foreground">
-          Bộ lọc
-        </span>
+        <span className="text-[10.5px] uppercase tracking-[0.16em] text-foreground">Bộ lọc</span>
         {active > 0 ? (
           <button
             type="button"

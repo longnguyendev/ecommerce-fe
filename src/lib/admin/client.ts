@@ -103,15 +103,10 @@ async function refreshAccessToken(): Promise<boolean> {
   return refreshing;
 }
 
-export async function gql<T>(
-  query: string,
-  variables?: Record<string, unknown>,
-): Promise<T> {
+export async function gql<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
   let json = await post<T>(query, variables, getToken());
 
-  const unauth = json.errors?.some(
-    (e) => e.extensions?.code === "UNAUTHENTICATED",
-  );
+  const unauth = json.errors?.some((e) => e.extensions?.code === "UNAUTHENTICATED");
   if (unauth) {
     const ok = await refreshAccessToken();
     if (ok) {

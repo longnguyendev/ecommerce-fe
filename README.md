@@ -43,14 +43,14 @@ app/
 
 ## Trang chủ — các section
 
-| # | Section | Thành phần |
-|---|---|---|
-| 1 | Hero | `hero.tsx` — full-bleed ảnh "Love" + 2 CTA + h1 sr-only |
-| 2 | 5 tile hoạt động | `collection-tiles.tsx` (Court/Studio/Tập luyện/Lounge/Chạy bộ) |
-| 3 | Bộ sưu tập | product grid (collection lookbook) |
-| 4 | Tất cả sản phẩm | product grid + nút "Xem tất cả" → `/products` |
-| 5 | Shop the Look | `shop-the-look.tsx` (Instagram gallery) |
-| 6 | Header + footer + cart drawer | `site-header.tsx`, `site-footer.tsx` |
+| #   | Section                       | Thành phần                                                     |
+| --- | ----------------------------- | -------------------------------------------------------------- |
+| 1   | Hero                          | `hero.tsx` — full-bleed ảnh "Love" + 2 CTA + h1 sr-only        |
+| 2   | 5 tile hoạt động              | `collection-tiles.tsx` (Court/Studio/Tập luyện/Lounge/Chạy bộ) |
+| 3   | Bộ sưu tập                    | product grid (collection lookbook)                             |
+| 4   | Tất cả sản phẩm               | product grid + nút "Xem tất cả" → `/products`                  |
+| 5   | Shop the Look                 | `shop-the-look.tsx` (Instagram gallery)                        |
+| 6   | Header + footer + cart drawer | `site-header.tsx`, `site-footer.tsx`                           |
 
 ## Đã kiểm tra
 

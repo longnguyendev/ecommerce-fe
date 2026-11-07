@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { gql, resolveImageUrl, uploadImage } from "@/lib/admin/client";
@@ -175,8 +176,7 @@ export function ProductImagesSection({
     <div className="rounded-lg border border-border bg-background p-6">
       <h2 className="mb-1 text-[15px] font-medium">Hình ảnh sản phẩm</h2>
       <p className="mb-4 text-[12px] text-muted-foreground">
-        Ảnh đầu tiên là ảnh đại diện. Kéo thả ảnh lên vị trí đầu để đặt làm ảnh
-        đại diện.
+        Ảnh đầu tiên là ảnh đại diện. Kéo thả ảnh lên vị trí đầu để đặt làm ảnh đại diện.
       </p>
 
       {error ? (

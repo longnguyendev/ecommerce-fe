@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+
 import { useAdminGuard } from "@/hooks/use-admin-guard";
 
 /**
@@ -32,12 +33,9 @@ export function useAdminList<T>(fetcher: () => Promise<T[]>, loadError: string) 
 
   const load = useCallback(
     () =>
-      run(
-        async () => {
-          /* chỉ tải lại */
-        },
-        loadError,
-      ),
+      run(async () => {
+        /* chỉ tải lại */
+      }, loadError),
     [run, loadError],
   );
 

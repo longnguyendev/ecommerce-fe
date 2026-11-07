@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+
 import { ProductImageCarousel } from "@/components/product/product-image-carousel";
 
 const MAX_SWATCHES = 5;
@@ -49,8 +50,7 @@ export function ProductCardView({
   const shownCompareAt = current ? current.compareAtText : compareAtText;
   const shownDiscount = current ? current.discountPercent : discountPercent;
   const base = `/products/${slug}`;
-  const href =
-    touched && current ? `${base}?color=${encodeURIComponent(current.name)}` : base;
+  const href = touched && current ? `${base}?color=${encodeURIComponent(current.name)}` : base;
 
   return (
     <article className="group pb-1">
@@ -66,12 +66,17 @@ export function ProductCardView({
       <div className="mt-3 px-0.5">
         <div className="flex items-start justify-between gap-2">
           <Link href={href} className="min-w-0 flex-1">
-            <h2 className="line-clamp-1 text-[13px] font-normal text-foreground">
-              {name}
-            </h2>
+            <h2 className="line-clamp-1 text-[13px] font-normal text-foreground">{name}</h2>
           </Link>
           <span className="shrink-0 text-muted-foreground" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.4"
+            >
               <path d="M17.6 3.3c1.1.1 1.9 1.1 1.9 2.2V21L12 17.2 4.5 21V5.5c0-1.1.8-2 1.9-2.2a48.5 48.5 0 0 1 11.2 0Z" />
             </svg>
           </span>
@@ -80,9 +85,7 @@ export function ProductCardView({
         <div className="mt-0.5 flex items-center gap-1.5">
           <span className="text-[13px] text-foreground">{shownPrice}</span>
           {shownCompareAt ? (
-            <span className="text-[11.5px] text-[#999] line-through">
-              {shownCompareAt}
-            </span>
+            <span className="text-[11.5px] text-[#999] line-through">{shownCompareAt}</span>
           ) : null}
         </div>
 

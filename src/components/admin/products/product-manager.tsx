@@ -2,25 +2,25 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Pagination, SearchInput } from "@/components/admin/list-controls";
+
 import { AdminShell } from "@/components/admin/admin-shell";
 import {
+  DataTable,
   Field,
   FormCard,
   RowActions,
   selectClass,
   textareaClass,
-  DataTable,
 } from "@/components/admin/form-controls";
-import { slugify } from "@/lib/slugify";
+import { Pagination, SearchInput } from "@/components/admin/list-controls";
 import { ProductImagesSection } from "@/components/admin/products/product-images-section";
 import {
   ProductVariantSection,
   type DraftResult,
 } from "@/components/admin/products/product-variant-section";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   gql,
   isAuthenticated,
@@ -29,6 +29,7 @@ import {
   type AdminProduct,
   type ProductStatus,
 } from "@/lib/admin/client";
+import { slugify } from "@/lib/slugify";
 
 const PAGE_SIZE = 20;
 
@@ -65,10 +66,7 @@ export function ProductManager() {
     draftVariants.current = r;
   }, []);
 
-  const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(total / PAGE_SIZE)),
-    [total],
-  );
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(total / PAGE_SIZE)), [total]);
 
   const loadCategories = useCallback(async () => {
     const data = await gql<{ categories: { nodes: AdminCategory[] } }>(
@@ -361,19 +359,13 @@ export function ProductManager() {
                 />
                 <div className="min-w-0">
                   <p className="truncate font-medium">{p.name}</p>
-                  <p className="truncate text-[11px] text-muted-foreground">
-                    /{p.slug}
-                  </p>
+                  <p className="truncate text-[11px] text-muted-foreground">/{p.slug}</p>
                 </div>
               </div>
             </td>
-            <td className="px-4 py-3 text-muted-foreground">
-              {p.category.name}
-            </td>
+            <td className="px-4 py-3 text-muted-foreground">{p.category.name}</td>
             <td className="px-4 py-3">
-              {p.variants[0]
-                ? `${p.variants[0].price.toLocaleString("vi-VN")} ₫`
-                : "—"}
+              {p.variants[0] ? `${p.variants[0].price.toLocaleString("vi-VN")} ₫` : "—"}
             </td>
             <td className="px-4 py-3">
               <Badge
@@ -396,16 +388,12 @@ export function ProductManager() {
 
       {!busy && products.length === 0 ? (
         <p className="py-10 text-center text-[13px] text-muted-foreground">
-          {query
-            ? `Không tìm thấy sản phẩm nào cho “${query}”.`
-            : "Chưa có sản phẩm."}
+          {query ? `Không tìm thấy sản phẩm nào cho “${query}”.` : "Chưa có sản phẩm."}
         </p>
       ) : null}
 
       {busy && products.length === 0 ? (
-        <p className="py-10 text-center text-[13px] text-muted-foreground">
-          Đang tải…
-        </p>
+        <p className="py-10 text-center text-[13px] text-muted-foreground">Đang tải…</p>
       ) : null}
 
       <Pagination page={page} totalPages={totalPages} onChange={setPage} />

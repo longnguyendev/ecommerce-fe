@@ -70,10 +70,7 @@ interface GraphQLResponse<T> {
   errors?: { message: string }[];
 }
 
-async function gql<T>(
-  query: string,
-  variables?: Record<string, unknown>,
-): Promise<T> {
+async function gql<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
   const res = await fetch(`${API_URL}/graphql`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -149,8 +146,7 @@ export function mapProduct(p: GqlProduct): Product {
     { images: string[]; price?: number; compareAt?: number | null }
   >();
   for (const v of p.variants) {
-    const name = v.attributes.find((a) => a.attribute.name === "Màu sắc")
-      ?.attributeValue.value;
+    const name = v.attributes.find((a) => a.attribute.name === "Màu sắc")?.attributeValue.value;
     if (!name) continue;
     const entry = byColor.get(name) ?? { images: [] };
     for (const img of v.images ?? []) {
@@ -172,9 +168,7 @@ export function mapProduct(p: GqlProduct): Product {
 
   // Thư viện ảnh chung = ảnh không gắn biến thể (nếu có).
   const shared = p.images.filter((i) => !i.variantId);
-  const gallery = (shared.length > 0 ? shared : p.images).map((i) =>
-    resolveImageUrl(i.url),
-  );
+  const gallery = (shared.length > 0 ? shared : p.images).map((i) => resolveImageUrl(i.url));
 
   return {
     slug: p.slug,
@@ -246,8 +240,6 @@ export async function fetchProductDetail(
   if (!data.productBySlug) return null;
   return {
     product: mapProduct(data.productBySlug),
-    variants: data.productBySlug.variants
-      .filter((v) => v.isActive)
-      .map(mapVariant),
+    variants: data.productBySlug.variants.filter((v) => v.isActive).map(mapVariant),
   };
 }

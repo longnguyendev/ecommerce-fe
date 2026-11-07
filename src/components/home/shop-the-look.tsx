@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 import { SectionHeading } from "@/components/shared/section-heading";
 import { INSTAGRAM } from "@/data/home";
 
@@ -25,13 +26,9 @@ export function ShopTheLook() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover/card:opacity-80" />
               <div className="absolute bottom-0 left-0 right-0 p-3">
                 <div className="flex items-center gap-2">
-                  <p className="truncate text-[10px] font-medium text-white">
-                    {card.handle}
-                  </p>
+                  <p className="truncate text-[10px] font-medium text-white">{card.handle}</p>
                 </div>
-                <p className="mt-1.5 line-clamp-1 text-[10px] text-white/80">
-                  {card.caption}
-                </p>
+                <p className="mt-1.5 line-clamp-1 text-[10px] text-white/80">{card.caption}</p>
               </div>
             </div>
           </a>

@@ -1,8 +1,5 @@
 import { ValueCombobox } from "@/components/admin/products/value-combobox";
-import type {
-  Attribute,
-  Option,
-} from "@/components/admin/products/variant-logic";
+import type { Attribute, Option } from "@/components/admin/products/variant-logic";
 
 export function VariantOptionsEditor({
   options,
@@ -34,10 +31,7 @@ export function VariantOptionsEditor({
     <>
       <div className="divide-y divide-border border-y border-border">
         {options.map((opt, i) => (
-          <div
-            key={opt.attributeId}
-            className="grid gap-4 py-4 sm:grid-cols-[240px_1fr]"
-          >
+          <div key={opt.attributeId} className="grid gap-4 py-4 sm:grid-cols-[240px_1fr]">
             <div>
               <div className="mb-1 text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
                 Thuộc tính
@@ -45,17 +39,11 @@ export function VariantOptionsEditor({
               <div className="flex items-center gap-2">
                 <select
                   value={opt.attributeId}
-                  onChange={(e) =>
-                    onPatchOption(i, { attributeId: e.target.value })
-                  }
+                  onChange={(e) => onPatchOption(i, { attributeId: e.target.value })}
                   className="h-9 w-full rounded border border-border bg-background px-2 text-[13px] outline-none focus:border-foreground"
                 >
                   {attributes
-                    .filter(
-                      (a) =>
-                        a.id === opt.attributeId ||
-                        !usedAttributeIds.includes(a.id),
-                    )
+                    .filter((a) => a.id === opt.attributeId || !usedAttributeIds.includes(a.id))
                     .map((a) => (
                       <option key={a.id} value={a.id}>
                         {a.name}
