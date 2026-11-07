@@ -41,16 +41,28 @@ export function FormCard({
   children: React.ReactNode;
 }) {
   return (
-    <form onSubmit={onSubmit} className="mb-6 rounded-lg border border-border bg-background p-6">
+    <form
+      onSubmit={onSubmit}
+      className="mb-6 rounded-lg border border-border bg-background p-6"
+    >
       <h2 className="mb-4 text-[13px] uppercase tracking-[0.12em]">{title}</h2>
       <div className="grid gap-4 sm:grid-cols-2">{children}</div>
       <div className="mt-4 flex justify-end gap-3">
         {onCancel ? (
-          <Button type="button" variant="outline" onClick={onCancel} className="h-10 rounded-none text-xs">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className="h-10 rounded-none text-xs"
+          >
             Huỷ
           </Button>
         ) : null}
-        <Button type="submit" disabled={busy} className="h-10 rounded-none text-xs uppercase tracking-[0.1em]">
+        <Button
+          type="submit"
+          disabled={busy}
+          className="h-10 rounded-none text-xs uppercase tracking-[0.1em]"
+        >
           {busy ? "Đang lưu…" : submitLabel}
         </Button>
       </div>
@@ -69,10 +81,20 @@ export function RowActions({
 }) {
   return (
     <div className="flex justify-end gap-2">
-      <Button variant="outline" size="sm" onClick={onEdit} className="h-7 rounded-none text-[11px]">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onEdit}
+        className="h-7 rounded-none text-[11px]"
+      >
         {editLabel}
       </Button>
-      <Button variant="destructive" size="sm" onClick={onDelete} className="h-7 rounded-none text-[11px]">
+      <Button
+        variant="destructive"
+        size="sm"
+        onClick={onDelete}
+        className="h-7 rounded-none text-[11px]"
+      >
         Xoá
       </Button>
     </div>
@@ -92,7 +114,10 @@ export function DataTable({
         <thead>
           <tr className="border-b border-border text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
             {columns.map((c) => (
-              <th key={c.label} className={`px-4 py-3 font-normal ${c.right ? "text-right" : ""}`}>
+              <th
+                key={c.label}
+                className={`px-4 py-3 font-normal ${c.right ? "text-right" : ""}`}
+              >
                 {c.label}
               </th>
             ))}

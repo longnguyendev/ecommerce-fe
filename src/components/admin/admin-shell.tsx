@@ -35,7 +35,9 @@ export function AdminShell({
           <div>
             <h1 className="text-2xl font-medium tracking-tight">{title}</h1>
             {subtitle ? (
-              <p className="mt-1 text-[13px] text-muted-foreground">{subtitle}</p>
+              <p className="mt-1 text-[13px] text-muted-foreground">
+                {subtitle}
+              </p>
             ) : null}
           </div>
           {action}

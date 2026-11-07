@@ -29,12 +29,19 @@ export function AttributeManager() {
       ).attributes.nodes,
     [],
   );
-  const { items: attributes, busy, error, run } = useAdminList(fetchAttributes, "Tải thuộc tính thất bại");
+  const {
+    items: attributes,
+    busy,
+    error,
+    run,
+  } = useAdminList(fetchAttributes, "Tải thuộc tính thất bại");
 
   const [name, setName] = useState("");
   const [values, setValues] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [newValueByAttr, setNewValueByAttr] = useState<Record<string, string>>({});
+  const [newValueByAttr, setNewValueByAttr] = useState<Record<string, string>>(
+    {},
+  );
 
   function reset() {
     setName("");
@@ -86,19 +93,28 @@ export function AttributeManager() {
   async function deleteValue(v: AttributeValue) {
     if (!window.confirm(`Xoá giá trị "${v.value}"?`)) return;
     await run(async () => {
-      await gql(`mutation DeleteValue($id: ID!) { deleteAttributeValue(id: $id) }`, { id: v.id });
+      await gql(
+        `mutation DeleteValue($id: ID!) { deleteAttributeValue(id: $id) }`,
+        { id: v.id },
+      );
     }, "Xoá giá trị thất bại");
   }
 
   async function deleteAttr(a: Attribute) {
     if (!window.confirm(`Xoá thuộc tính "${a.name}"?`)) return;
     await run(async () => {
-      await gql(`mutation DeleteAttr($id: ID!) { deleteAttribute(id: $id) }`, { id: a.id });
+      await gql(`mutation DeleteAttr($id: ID!) { deleteAttribute(id: $id) }`, {
+        id: a.id,
+      });
     }, "Xoá thuộc tính thất bại");
   }
 
   return (
-    <AdminShell title="Quản lý thuộc tính" subtitle={`${attributes.length} thuộc tính`} error={error}>
+    <AdminShell
+      title="Quản lý thuộc tính"
+      subtitle={`${attributes.length} thuộc tính`}
+      error={error}
+    >
       <FormCard
         title={editingId ? "Sửa thuộc tính" : "Thêm thuộc tính"}
         busy={busy}
@@ -106,23 +122,46 @@ export function AttributeManager() {
         onCancel={editingId ? reset : undefined}
       >
         <Field label="Tên thuộc tính *">
-          <Input value={name} onChange={(e) => setName(e.target.value)} required className="rounded-none" placeholder="Màu sắc" />
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="rounded-none"
+            placeholder="Màu sắc"
+          />
         </Field>
         <Field label="Giá trị (phân cách bằng dấu phẩy)">
-          <Input value={values} onChange={(e) => setValues(e.target.value)} className="rounded-none" placeholder="Đen, Trắng, Be" />
+          <Input
+            value={values}
+            onChange={(e) => setValues(e.target.value)}
+            className="rounded-none"
+            placeholder="Đen, Trắng, Be"
+          />
         </Field>
       </FormCard>
 
       <div className="space-y-4">
         {attributes.map((a) => (
-          <div key={a.id} className="rounded-lg border border-border bg-background p-4">
+          <div
+            key={a.id}
+            className="rounded-lg border border-border bg-background p-4"
+          >
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[13px] uppercase tracking-[0.1em]">{a.name}</h2>
-              <RowActions onEdit={() => openEdit(a)} onDelete={() => deleteAttr(a)} />
+              <h2 className="text-[13px] uppercase tracking-[0.1em]">
+                {a.name}
+              </h2>
+              <RowActions
+                onEdit={() => openEdit(a)}
+                onDelete={() => deleteAttr(a)}
+              />
             </div>
             <div className="flex flex-wrap gap-2">
               {a.values.map((v) => (
-                <Badge key={v.id} variant="secondary" className="group/value rounded-none text-[12px]">
+                <Badge
+                  key={v.id}
+                  variant="secondary"
+                  className="group/value rounded-none text-[12px]"
+                >
                   {v.value}
                   <button
                     type="button"
@@ -138,7 +177,12 @@ export function AttributeManager() {
             <div className="mt-3 flex gap-2">
               <Input
                 value={newValueByAttr[a.id] ?? ""}
-                onChange={(e) => setNewValueByAttr((prev) => ({ ...prev, [a.id]: e.target.value }))}
+                onChange={(e) =>
+                  setNewValueByAttr((prev) => ({
+                    ...prev,
+                    [a.id]: e.target.value,
+                  }))
+                }
                 className="h-8 rounded-none text-[13px]"
                 placeholder="Thêm giá trị mới…"
               />

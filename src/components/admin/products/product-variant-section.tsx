@@ -1,16 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ValueCombobox } from "@/components/admin/products/value-combobox";
+import { VariantOptionsEditor } from "@/components/admin/products/variant-options-editor";
+import { VariantRow } from "@/components/admin/products/variant-row";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/slugify";
-import { gql, resolveImageUrl, uploadImage } from "@/lib/admin/client";
+import { gql, uploadImage } from "@/lib/admin/client";
 import {
   buildCombos,
   comboKey,
   DEFAULT_COMBO,
-  formatVnd,
   resolveRow,
   VARIANT_FIELDS,
   type Attribute,
@@ -314,97 +314,19 @@ export function ProductVariantSection({
       ) : null}
 
       {hasVariants ? (
-        <>
-          <div className="divide-y divide-border border-y border-border">
-            {options.map((opt, i) => (
-              <div
-                key={opt.attributeId}
-                className="grid gap-4 py-4 sm:grid-cols-[240px_1fr]"
-              >
-                <div>
-                  <div className="mb-1 text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
-                    Thuộc tính
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={opt.attributeId}
-                      onChange={(e) =>
-                        patchOption(i, { attributeId: e.target.value })
-                      }
-                      className="h-9 w-full rounded border border-border bg-background px-2 text-[13px] outline-none focus:border-foreground"
-                    >
-                      {attributes
-                        .filter(
-                          (a) =>
-                            a.id === opt.attributeId ||
-                            !usedAttributeIds.includes(a.id),
-                        )
-                        .map((a) => (
-                          <option key={a.id} value={a.id}>
-                            {a.name}
-                          </option>
-                        ))}
-                    </select>
-                    <button
-                      type="button"
-                      onClick={() => removeOption(i)}
-                      className="text-[12px] text-destructive hover:underline"
-                    >
-                      Xoá
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="mb-1 text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
-                    Giá trị
-                  </div>
-                  <div className="space-y-2">
-                    {opt.values.map((v) => (
-                      <div key={v} className="flex items-center gap-2">
-                        <div className="h-9 flex-1 rounded border border-border px-3 text-[13px] leading-9">
-                          {v}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeValue(i, v)}
-                          aria-label={`Xoá ${v}`}
-                          className="px-2 text-[16px] text-muted-foreground hover:text-foreground"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                    <ValueCombobox
-                      draft={opt.draft}
-                      open={openIndex === i}
-                      suggestions={suggestionsFor(opt)}
-                      onOpen={() => setOpenIndex(i)}
-                      onClose={() =>
-                        setOpenIndex((cur) => (cur === i ? null : cur))
-                      }
-                      onDraftChange={(draft) => patchOption(i, { draft })}
-                      onPick={(value) => {
-                        addValue(i, value);
-                        setOpenIndex(null);
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {canAddOption ? (
-            <button
-              type="button"
-              onClick={addOption}
-              className="my-3 text-[13px] text-blue-600 hover:underline"
-            >
-              + Thêm thuộc tính khác
-            </button>
-          ) : null}
-        </>
+        <VariantOptionsEditor
+          options={options}
+          attributes={attributes}
+          openIndex={openIndex}
+          canAddOption={canAddOption}
+          suggestionsFor={suggestionsFor}
+          onOpenIndex={setOpenIndex}
+          onPatchOption={patchOption}
+          onRemoveOption={removeOption}
+          onAddOption={addOption}
+          onAddValue={addValue}
+          onRemoveValue={removeValue}
+        />
       ) : null}
 
       <div className="mt-2 border-t border-border pt-4">
@@ -444,83 +366,17 @@ export function ProductVariantSection({
         </div>
 
         <div className="divide-y divide-border">
-          {displayCombos.map((c) => {
-            const r = resolveRow(rows, c);
-            return (
-              <div
-                key={c.key}
-                className="grid grid-cols-2 items-center gap-2 py-3 sm:grid-cols-[56px_1.2fr_1.2fr_1fr_0.8fr]"
-              >
-                <div className="relative h-12 w-12">
-                  {r.image ? (
-                    <>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={resolveImageUrl(r.image)}
-                        alt=""
-                        className="h-12 w-12 rounded border border-border object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => patchRow(c, { image: "" })}
-                        aria-label="Xoá ảnh biến thể"
-                        className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[11px] leading-none text-background"
-                      >
-                        ×
-                      </button>
-                    </>
-                  ) : (
-                    <label
-                      title="Thêm ảnh đại diện cho biến thể"
-                      className="flex h-12 w-12 cursor-pointer items-center justify-center rounded border border-dashed border-border text-center text-[10px] leading-tight text-blue-600 hover:bg-muted"
-                    >
-                      {uploadingKey === c.key ? "…" : "+ Ảnh"}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        disabled={uploadingKey !== null}
-                        onChange={(e) => {
-                          void onPickImage(c, e.target.files?.[0]);
-                          e.target.value = "";
-                        }}
-                      />
-                    </label>
-                  )}
-                </div>
-                <div className="col-span-2 text-[13px] font-medium sm:col-span-1">
-                  {c.label}
-                  {r.price ? (
-                    <span className="ml-2 text-[12px] font-normal text-muted-foreground">
-                      {formatVnd(r.price)}
-                    </span>
-                  ) : null}
-                </div>
-                <Input
-                  value={r.sku}
-                  onChange={(e) => patchRow(c, { sku: e.target.value })}
-                  placeholder="SKU (tự sinh nếu trống)"
-                  className="h-8 rounded text-[12.5px]"
-                />
-                <Input
-                  type="number"
-                  min={0}
-                  value={r.price}
-                  onChange={(e) => patchRow(c, { price: e.target.value })}
-                  placeholder="Giá (VND)"
-                  className="h-8 rounded text-[12.5px]"
-                />
-                <Input
-                  type="number"
-                  min={0}
-                  value={r.stock}
-                  onChange={(e) => patchRow(c, { stock: e.target.value })}
-                  placeholder="Tồn kho"
-                  className="h-8 rounded text-[12.5px]"
-                />
-              </div>
-            );
-          })}
+          {displayCombos.map((c) => (
+            <VariantRow
+              key={c.key}
+              combo={c}
+              row={resolveRow(rows, c)}
+              uploading={uploadingKey === c.key}
+              uploadDisabled={uploadingKey !== null}
+              onPatch={(patch) => patchRow(c, patch)}
+              onPickImage={(file) => void onPickImage(c, file)}
+            />
+          ))}
         </div>
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
@@ -553,4 +409,3 @@ export function ProductVariantSection({
     </div>
   );
 }
-

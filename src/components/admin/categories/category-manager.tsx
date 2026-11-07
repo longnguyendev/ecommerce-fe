@@ -2,7 +2,12 @@
 
 import { useCallback, useState } from "react";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { DataTable, Field, FormCard, RowActions } from "@/components/admin/form-controls";
+import {
+  DataTable,
+  Field,
+  FormCard,
+  RowActions,
+} from "@/components/admin/form-controls";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAdminList } from "@/hooks/use-admin-list";
@@ -19,7 +24,12 @@ export function CategoryManager() {
       ).categories.nodes,
     [],
   );
-  const { items: categories, busy, error, run } = useAdminList(fetchCategories, "Tải danh mục thất bại");
+  const {
+    items: categories,
+    busy,
+    error,
+    run,
+  } = useAdminList(fetchCategories, "Tải danh mục thất bại");
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -60,7 +70,10 @@ export function CategoryManager() {
   async function onDelete(c: AdminCategory) {
     if (!window.confirm(`Xoá danh mục "${c.name}"?`)) return;
     await run(async () => {
-      await gql(`mutation DeleteCategory($id: ID!) { deleteCategory(id: $id) }`, { id: c.id });
+      await gql(
+        `mutation DeleteCategory($id: ID!) { deleteCategory(id: $id) }`,
+        { id: c.id },
+      );
     }, "Xoá danh mục thất bại");
   }
 
@@ -88,20 +101,40 @@ export function CategoryManager() {
         onCancel={editingId ? reset : undefined}
       >
         <Field label="Tên *">
-          <Input value={name} onChange={(e) => setName(e.target.value)} required className="rounded-none" placeholder="Bra" />
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="rounded-none"
+            placeholder="Bra"
+          />
         </Field>
         <Field label="Slug (bỏ trống để tự sinh)">
-          <Input value={slug} onChange={(e) => setSlug(e.target.value)} className="rounded-none" placeholder="bra" />
+          <Input
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            className="rounded-none"
+            placeholder="bra"
+          />
         </Field>
       </FormCard>
 
-      <DataTable columns={[{ label: "Tên" }, { label: "Slug" }, { label: "Thao tác", right: true }]}>
+      <DataTable
+        columns={[
+          { label: "Tên" },
+          { label: "Slug" },
+          { label: "Thao tác", right: true },
+        ]}
+      >
         {categories.map((c) => (
           <tr key={c.id} className="border-b border-border last:border-0">
             <td className="px-4 py-3 font-medium">{c.name}</td>
             <td className="px-4 py-3 text-muted-foreground">/{c.slug}</td>
             <td className="px-4 py-3 text-right">
-              <RowActions onEdit={() => openEdit(c)} onDelete={() => onDelete(c)} />
+              <RowActions
+                onEdit={() => openEdit(c)}
+                onDelete={() => onDelete(c)}
+              />
             </td>
           </tr>
         ))}

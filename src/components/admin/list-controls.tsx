@@ -34,7 +34,9 @@ export function SearchInput({
           </button>
         ) : null}
       </div>
-      {summary ? <span className="text-[12.5px] text-muted-foreground">{summary}</span> : null}
+      {summary ? (
+        <span className="text-[12.5px] text-muted-foreground">{summary}</span>
+      ) : null}
     </div>
   );
 }

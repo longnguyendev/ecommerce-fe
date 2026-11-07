@@ -39,13 +39,11 @@ export interface Combo {
   options: { attributeId: string; value: string }[];
 }
 
-
 export const VARIANT_FIELDS = `
   id sku price compareAtPrice stockQuantity isActive
   attributes { attribute { id name } attributeValue { id value } }
   images { url }
 `;
-
 
 export const DEFAULT_KEY = "__default__";
 
@@ -60,7 +58,9 @@ export interface DraftVariant {
 /** Kết quả dựng biến thể để lưu (dùng cho chế độ tạo sản phẩm mới). */
 export type DraftResult = { variants: DraftVariant[] } | { error: string };
 
-export function comboKey(opts: { attributeId: string; value: string }[]): string {
+export function comboKey(
+  opts: { attributeId: string; value: string }[],
+): string {
   if (opts.length === 0) return DEFAULT_KEY;
   return opts
     .map((o) => `${o.attributeId}:${o.value}`)
@@ -97,7 +97,10 @@ export const EMPTY_ROW: RowData = { sku: "", price: "", stock: "0", image: "" };
  *   SKU thêm hậu tố giá trị mới để không trùng;
  * - dòng cũ là tập cha của tổ hợp mới (bớt thuộc tính) -> giữ nguyên dòng đầu tiên.
  */
-export function resolveRow(rows: Record<string, RowData>, combo: Combo): RowData {
+export function resolveRow(
+  rows: Record<string, RowData>,
+  combo: Combo,
+): RowData {
   const exact = rows[combo.key];
   if (exact) return exact;
 
@@ -147,4 +150,3 @@ export const DEFAULT_COMBO: Combo = {
   label: "Mặc định",
   options: [],
 };
-

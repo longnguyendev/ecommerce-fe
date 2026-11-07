@@ -22,7 +22,9 @@ export function ValueCombobox({
   onPick: (value: string) => void;
 }) {
   const typed = draft.trim();
-  const exact = suggestions.some((v) => v.toLowerCase() === typed.toLowerCase());
+  const exact = suggestions.some(
+    (v) => v.toLowerCase() === typed.toLowerCase(),
+  );
 
   return (
     <div className="relative">

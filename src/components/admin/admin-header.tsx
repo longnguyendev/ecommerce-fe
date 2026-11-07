@@ -52,7 +52,11 @@ export function AdminHeader() {
           >
             Xem storefront
           </Button>
-          <Button variant="ghost" onClick={logout} className="h-9 rounded-none text-xs">
+          <Button
+            variant="ghost"
+            onClick={logout}
+            className="h-9 rounded-none text-xs"
+          >
             Đăng xuất
           </Button>
         </div>
