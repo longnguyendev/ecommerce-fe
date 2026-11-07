@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { HERO } from "@/data/home";
 import { Button } from "@/components/ui/button";
@@ -7,18 +8,22 @@ export function Hero() {
     <section className="relative bg-foreground">
       <div className="relative aspect-[2/3] sm:aspect-auto sm:h-[calc(100vh-64px)]">
         {/* mobile portrait */}
-        <img
+        <Image
           src={HERO.imageMobile}
           alt={HERO.alt}
-          className="absolute inset-0 h-full w-full object-cover sm:hidden"
-          loading="eager"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover sm:hidden"
         />
         {/* desktop landscape */}
-        <img
+        <Image
           src={HERO.image}
           alt={HERO.alt}
-          className="absolute inset-0 hidden h-full w-full object-cover sm:block"
-          loading="eager"
+          fill
+          priority
+          sizes="100vw"
+          className="hidden object-cover sm:block"
         />
         <div className="absolute inset-0 bg-black/10" />
 

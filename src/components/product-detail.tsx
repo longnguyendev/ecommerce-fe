@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { isLocalImage } from "@/lib/image-url";
 import { formatPrice, type Product } from "@/lib/catalog";
 import { colorHex, type StoreVariant } from "@/lib/storefront/api";
 
@@ -108,10 +110,14 @@ export function ProductDetail({
     <div className="grid gap-10 lg:grid-cols-[1.12fr_1fr] lg:gap-16">
       <div>
         <div className="relative aspect-[4/5] overflow-hidden bg-muted">
-          <img
+          <Image
             src={gallery[active] ?? gallery[0]}
             alt={product.name}
-            className="h-full w-full object-cover"
+            fill
+            priority
+            sizes="(min-width:1024px) 55vw, 100vw"
+            unoptimized={isLocalImage(gallery[active] ?? gallery[0])}
+            className="object-cover"
           />
         </div>
         {gallery.length > 1 ? (
@@ -126,7 +132,14 @@ export function ProductDetail({
                   i === active ? "border-foreground" : "border-transparent"
                 }`}
               >
-                <img src={img} alt="" className="h-full w-full object-cover" />
+                <Image
+                  src={img}
+                  alt=""
+                  fill
+                  sizes="64px"
+                  unoptimized={isLocalImage(img)}
+                  className="object-cover"
+                />
               </button>
             ))}
           </div>
@@ -226,7 +239,7 @@ export function ProductDetail({
 
         <div className="mt-8">
           <Accordion title="Mô tả sản phẩm">
-            <p>{product.description ?? `${product.name} — thuộc bộ sưu tập của EQL Apparel.`}</p>
+            <p>{product.description ?? `${product.name} — thuộc bộ sưu tập của OXI Apparel.`}</p>
           </Accordion>
           <Accordion title="Chất liệu &amp; bảo quản">
             <p>Giặt máy ở nhiệt độ thường, không sấy nóng, không dùng chất tẩy mạnh.</p>

@@ -6,7 +6,7 @@ const MESSAGES = [
   "Miễn phí vận chuyển đơn hàng trên 999.000 ₫",
   "Đổi size dễ dàng trong 7 ngày",
   "Thanh toán khi nhận hàng (COD) toàn quốc",
-  "Tham gia EQL Rewards — 7 hạng thành viên, đặc quyền riêng",
+  "Tham gia OXI Rewards — 7 hạng thành viên, đặc quyền riêng",
 ];
 
 export function Announcement() {

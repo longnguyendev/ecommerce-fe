@@ -10,9 +10,9 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "EQL Apparel",
+  title: "OXI Apparel",
   description:
-    "Bản clone cục bộ eql-apparel.com — Next.js + shadcn/ui (storefront + admin).",
+    "Bản clone cục bộ oxi-apparel.com — Next.js + shadcn/ui (storefront + admin).",
 };
 
 export default function RootLayout({

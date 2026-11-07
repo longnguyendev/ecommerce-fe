@@ -90,9 +90,9 @@ export function SiteHeader() {
           <Link
             href="/"
             className="justify-self-center text-[24px] font-medium tracking-[0.14em] text-foreground"
-            aria-label="EQL Apparel"
+            aria-label="OXI Apparel"
           >
-            EQL
+            OXI
           </Link>
 
           <div className="flex items-center justify-end gap-3.5 text-foreground">

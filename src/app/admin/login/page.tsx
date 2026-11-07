@@ -47,7 +47,7 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-[#f4f4f4] px-4">
       <div className="w-full max-w-sm rounded-lg border border-border bg-background p-8 shadow-sm">
         <div className="mb-6 text-center">
-          <p className="text-2xl font-medium tracking-[0.14em]">EQL</p>
+          <p className="text-2xl font-medium tracking-[0.14em]">OXI</p>
           <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
             Quản trị viên
           </p>

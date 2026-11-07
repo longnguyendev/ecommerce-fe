@@ -4,18 +4,9 @@ import { CollectionTiles } from "@/components/collection-tiles";
 import { ProductCard } from "@/components/product-card";
 import { ShopTheLook } from "@/components/shop-the-look";
 import { Button } from "@/components/ui/button";
-import { ALL_SLUGS, COLLECTION_SLUGS } from "@/data/home";
-import type { Product } from "@/lib/catalog";
 import { fetchAllProducts } from "@/lib/storefront/api";
 
 export const dynamic = "force-dynamic";
-
-function selectBySlugs(products: Product[], slugs: string[]): Product[] {
-  const bySlug = new Map(products.map((p) => [p.slug, p]));
-  return slugs
-    .map((s) => bySlug.get(s))
-    .filter((p): p is Product => Boolean(p));
-}
 
 function SectionHeading({ title, aside }: { title: string; aside?: string }) {
   return (
@@ -34,12 +25,8 @@ function SectionHeading({ title, aside }: { title: string; aside?: string }) {
 
 export default async function Home() {
   const all = await fetchAllProducts();
-  const collections = selectBySlugs(all, COLLECTION_SLUGS);
-  const allProducts = selectBySlugs(all, ALL_SLUGS);
-
-  // Fallback if the curated slug lists don't resolve against the current catalog.
-  const collectionList = collections.length >= 4 ? collections : all.slice(0, 32);
-  const allList = allProducts.length >= 4 ? allProducts : all.slice(0, 50);
+  const collectionList = all.slice(0, 8);
+  const allList = all.length > 8 ? all.slice(8, 48) : all;
 
   return (
     <>

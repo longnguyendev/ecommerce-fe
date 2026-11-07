@@ -43,7 +43,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
         <div className="mb-10">
           <Link href="/" className="text-2xl tracking-[0.2em] text-foreground">
-            EQL
+            OXI
           </Link>
         </div>
 
@@ -127,7 +127,7 @@ export function SiteFooter() {
           </div>
           <div className="flex items-center gap-4 text-[#767676]">
             <a
-              href="https://www.instagram.com/eql.apparel/"
+              href="#"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
@@ -138,7 +138,7 @@ export function SiteFooter() {
               </svg>
             </a>
             <a
-              href="https://www.tiktok.com/@eql.apparel"
+              href="#"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="TikTok"
@@ -149,7 +149,7 @@ export function SiteFooter() {
               </svg>
             </a>
             <a
-              href="https://www.facebook.com/eql.apparel"
+              href="#"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
@@ -174,7 +174,7 @@ export function SiteFooter() {
 
         <div className="flex flex-col items-center justify-between gap-4 pt-6 sm:flex-row">
           <p className="text-xs text-[#767676]">
-            © 2026 EQL Apparel. Đã đăng ký bản quyền.
+            © 2026 OXI Apparel. Đã đăng ký bản quyền.
           </p>
           <div className="flex items-center gap-4 text-xs text-[#767676]">
             <Link href="/privacy" className="transition-opacity hover:opacity-70">

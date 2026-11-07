@@ -10,3 +10,8 @@ export function resolveImageUrl(url: string | null | undefined): string {
   if (url.startsWith("/uploads/")) return `${API_URL}${url}`;
   return url;
 }
+
+/** Ảnh từ API local (localhost/IP riêng) không đi qua optimizer của Next. */
+export function isLocalImage(src: string): boolean {
+  return /^https?:\/\/(localhost|127\.|10\.|192\.168\.)/.test(src);
+}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { INSTAGRAM } from "@/data/home";
 
 export function ShopTheLook() {
@@ -8,7 +9,7 @@ export function ShopTheLook() {
           Shop the Look
         </h2>
         <span className="text-[11px] font-normal uppercase tracking-[0.05em] text-[#767676]">
-          EQL on You
+          OXI on You
         </span>
       </div>
 
@@ -20,11 +21,12 @@ export function ShopTheLook() {
             className="group/card w-[calc(50%-1px)] flex-none cursor-pointer snap-start sm:w-[calc(33.333%-2px)] lg:w-[calc(25%-2px)]"
           >
             <div className="relative aspect-[4/5] overflow-hidden bg-muted">
-              <img
+              <Image
                 src={card.image}
                 alt={`${card.handle} — ${card.caption}`}
-                loading="lazy"
-                className="h-full w-full object-cover object-top transition-transform duration-500 group-hover/card:scale-[1.03]"
+                fill
+                sizes="(min-width:1024px) 25vw, (min-width:640px) 33vw, 50vw"
+                className="object-cover object-top transition-transform duration-500 group-hover/card:scale-[1.03]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover/card:opacity-80" />
               <div className="absolute bottom-0 left-0 right-0 p-3">

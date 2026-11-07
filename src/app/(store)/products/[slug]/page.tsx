@@ -14,7 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const detail = await fetchProductDetail(slug);
-  return { title: detail ? `${detail.product.name} — EQL` : "Không tìm thấy — EQL" };
+  return { title: detail ? `${detail.product.name} — OXI` : "Không tìm thấy — OXI" };
 }
 
 export default async function ProductPage({

@@ -1,5 +1,8 @@
 "use client";
 
+import Image from "next/image";
+import { isLocalImage } from "@/lib/image-url";
+
 import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -40,17 +43,17 @@ export function ProductImageCarousel({
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
           {images.map((src, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={`${src}-${i}`}
-              src={src}
-              alt={i === 0 ? name : `${name} — view ${i + 1}`}
-              width={400}
-              height={500}
-              loading="lazy"
-              draggable={false}
-              className="h-full w-full shrink-0 object-cover"
-            />
+            <div key={`${src}-${i}`} className="relative h-full w-full shrink-0">
+              <Image
+                src={src}
+                alt={i === 0 ? name : `${name} — view ${i + 1}`}
+                fill
+                sizes="(min-width:1024px) 25vw, 50vw"
+                draggable={false}
+                unoptimized={isLocalImage(src)}
+                className="object-cover"
+              />
+            </div>
           ))}
         </div>
 

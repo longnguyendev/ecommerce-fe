@@ -24,7 +24,7 @@ export function AdminHeader() {
     <header className="border-b border-border bg-background">
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-6">
-          <span className="text-xl font-medium tracking-[0.14em]">EQL</span>
+          <span className="text-xl font-medium tracking-[0.14em]">OXI</span>
           <nav className="flex items-center gap-1">
             {NAV.map((n) => {
               const active = pathname === n.href;

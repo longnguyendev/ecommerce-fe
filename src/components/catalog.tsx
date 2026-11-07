@@ -3,12 +3,12 @@
 import { useMemo, useState } from "react";
 import { ProductCard } from "./product-card";
 import {
-  COLOR_NAMES,
   colorName,
   formatPrice,
-  KINDS,
   kindOf,
-  PRICE_MAX,
+  colorNamesOf,
+  kindsOf,
+  priceMax,
   SWATCH_HEX,
   type Product,
 } from "@/lib/catalog";
@@ -55,10 +55,13 @@ function Group({
 }
 
 export function Catalog({ products }: { products: Product[] }) {
+  const KINDS = useMemo(() => kindsOf(products), [products]);
+  const COLOR_NAMES = useMemo(() => colorNamesOf(products), [products]);
+  const PRICE_MAX = useMemo(() => priceMax(products), [products]);
   const [kinds, setKinds] = useState<Set<string>>(new Set());
   const [colors, setColors] = useState<Set<string>>(new Set());
   const [saleOnly, setSaleOnly] = useState(false);
-  const [maxPrice, setMaxPrice] = useState(PRICE_MAX);
+  const [maxPrice, setMaxPrice] = useState(() => priceMax(products));
   const [sort, setSort] = useState<Sort>("featured");
   const [openMobile, setOpenMobile] = useState(false);
 

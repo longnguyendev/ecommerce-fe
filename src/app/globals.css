@@ -47,7 +47,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* ------------------------------------------------------------------ EQL tokens */
+/* ------------------------------------------------------------------ OXI tokens */
 :root {
   --background: #ffffff;
   --foreground: #000000;
@@ -103,7 +103,7 @@
   }
 }
 
-/* EQL helper utilities */
+/* OXI helper utilities */
 @utility container-page {
   margin-inline: auto;
   max-width: 1440px;

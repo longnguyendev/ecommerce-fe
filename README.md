@@ -1,6 +1,6 @@
-# EQL App — homepage + catalog rebuild (Next.js + shadcn/ui)
+# OXI App — homepage + catalog rebuild (Next.js + shadcn/ui)
 
-Bản dựng lại **sạch** trang chủ `eql-apparel.com/` (và nối sang `/products`) bằng
+Bản dựng lại **sạch** trang chủ `oxi-apparel.com/` (và nối sang `/products`) bằng
 **Next.js 15 (App Router) + Tailwind CSS v4 + shadcn/ui**, dùng design tokens đo
 được từ bản clone (`DM Sans`, nền trắng/đen, type scale 13px/16px, max-width
 1440px).
@@ -21,7 +21,6 @@ Production: `npm run build && npm start`
 
 ```
 app/
-├── data/catalog.json              ← 214 sản phẩm (từ eql-clone, scrape 2026-10-31)
 ├── public/images/
 │   ├── products/*  collections/*   ← 630 ảnh sản phẩm + tile
 │   ├── hero/ activity/ instagram/  ← ảnh trang chủ (từ bản mirror)
@@ -66,11 +65,10 @@ app/
   collection mới (Balance, Courtney, Muse, Poise, Rally, Focus, Bare, Shape, Flow).
   Vì vậy section "Tất cả sản phẩm" trên trang chủ hiện ít sản phẩm hơn trang gốc.
 - `/api/*` (giỏ hàng thật, tìm kiếm server) cần backend; giỏ hàng là drawer tĩnh.
-- Ảnh dùng `<img>` thường (không `next/image` optimize) — có thể nâng cấp sau.
-- Logo dùng chữ "EQL" thay wordmark gốc (không copy file logo thương hiệu).
+- Logo là chữ "OXI" (text logo).
 
 ## Pháp lý
 
-Logo, ảnh sản phẩm, tên sản phẩm, giá và nội dung là tài sản của EQL Apparel.
+Logo, ảnh sản phẩm, tên sản phẩm, giá và nội dung là tài sản của OXI Apparel.
 Bản sao **cục bộ** cho mục đích học kỹ thuật — không deploy công khai, không
 dùng để bán hàng hay giả mạo thương hiệu.

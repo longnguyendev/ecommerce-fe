@@ -1,5 +1,3 @@
-import raw from "../../data/catalog.json";
-
 /** Một màu của sản phẩm (lấy từ biến thể) kèm ảnh riêng của màu đó. */
 export type ColorOption = {
   name: string;
@@ -25,20 +23,6 @@ export type Product = {
   description?: string | null;
 };
 
-export type Tile = { label: string; href: string; image: string };
-
-export const CATALOG = raw as unknown as {
-  source: string;
-  scrapedAt: string;
-  brand: string;
-  hero: { h1: string; sub: string };
-  collections: Tile[];
-  filters: { categories: string[]; sizes: string[]; colors: string[] };
-  products: Product[];
-};
-
-export const PRODUCTS: Product[] = CATALOG.products;
-
 /* ---------------------------------------------------------------- prices */
 
 /** Deterministic — never rely on Intl between server and client. */
@@ -50,7 +34,9 @@ export function formatPrice(value: number): string {
   );
 }
 
-export const PRICE_MAX = Math.max(...PRODUCTS.map((p) => p.price));
+export function priceMax(products: Product[]): number {
+  return products.length ? Math.max(...products.map((p) => p.price)) : 0;
+}
 
 /* ---------------------------------------------------------------- colours */
 
@@ -118,24 +104,25 @@ const KIND_RULES: [RegExp, string][] = [
 ];
 
 export function kindOf(p: Product): string {
+  if (p.category) return p.category;
   for (const [re, kind] of KIND_RULES) if (re.test(p.name)) return kind;
   return "Khác";
 }
 
-export const KINDS = (() => {
+export function kindsOf(products: Product[]) {
   const counts = new Map<string, number>();
-  for (const p of PRODUCTS) {
+  for (const p of products) {
     const k = kindOf(p);
     counts.set(k, (counts.get(k) || 0) + 1);
   }
   return [...counts.entries()]
     .sort((a, b) => b[1] - a[1])
     .map(([name, count]) => ({ name, count }));
-})();
+}
 
-export const COLOR_NAMES = (() => {
+export function colorNamesOf(products: Product[]) {
   const seen = new Map<string, number>();
-  for (const p of PRODUCTS) {
+  for (const p of products) {
     for (const c of p.colors) {
       const n = colorName(c);
       seen.set(n, (seen.get(n) || 0) + 1);
@@ -144,18 +131,9 @@ export const COLOR_NAMES = (() => {
   return [...seen.entries()]
     .sort((a, b) => b[1] - a[1])
     .map(([name, count]) => ({ name, count }));
-})();
+}
 
 /* --------------------------------------------------------------- helpers */
-
-export function getProduct(slug: string): Product | undefined {
-  return PRODUCTS.find((p) => p.slug === slug);
-}
-
-export function relatedTo(p: Product, limit = 4): Product[] {
-  const kind = kindOf(p);
-  return PRODUCTS.filter((q) => q.slug !== p.slug && kindOf(q) === kind).slice(0, limit);
-}
 
 export const NAV = [
   { href: "/products", label: "Cửa hàng" },
