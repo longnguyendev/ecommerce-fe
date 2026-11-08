@@ -20,7 +20,7 @@ import { VariantOptionsEditor } from "@/components/admin/products/variant-option
 import { VariantRow } from "@/components/admin/products/variant-row";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { gql, uploadImage } from "@/lib/admin/client";
+import { gql } from "@/lib/admin/client";
 import { slugify } from "@/lib/slugify";
 
 export type { DraftResult, DraftVariant };
@@ -34,10 +34,16 @@ export function ProductVariantSection({
   productId,
   skuPrefix,
   onDraftChange,
+  onSaved,
+  imagesToken = 0,
 }: {
   productId?: string | null;
   skuPrefix?: string;
   onDraftChange?: (result: DraftResult) => void;
+  /** Gọi sau khi lưu biến thể thành công (để mục ảnh nạp lại danh sách màu). */
+  onSaved?: () => void;
+  /** Tăng giá trị này để nạp lại ảnh theo màu (khi ảnh sản phẩm thay đổi). */
+  imagesToken?: number;
 }) {
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [hasVariants, setHasVariants] = useState(false);
@@ -48,7 +54,8 @@ export function ProductVariantSection({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
-  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
+  /** Ảnh của sản phẩm theo màu: attributeValueId -> url đầu tiên. */
+  const [colorImages, setColorImages] = useState<Record<string, string>>({});
   /** Index của option đang mở danh sách gợi ý giá trị. */
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -90,7 +97,6 @@ export function ProductVariantSection({
           sku: v.sku,
           price: String(v.price),
           stock: String(v.stockQuantity),
-          image: v.images[0]?.url ?? "",
         };
       }
       setOptions(nextOptions);
@@ -168,18 +174,40 @@ export function ProductVariantSection({
       .filter((v) => !q || v.toLowerCase().includes(q));
   }
 
-  async function onPickImage(combo: Combo, file: File | undefined) {
-    if (!file) return;
-    setUploadingKey(combo.key);
-    setError(null);
-    try {
-      const url = await uploadImage(file);
-      patchRow(combo, { image: url });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload ảnh thất bại");
-    } finally {
-      setUploadingKey(null);
-    }
+  // Ảnh theo màu: nạp lại khi ảnh sản phẩm đổi.
+  useEffect(() => {
+    if (!productId) return;
+    void gql<{ productImages: { nodes: { url: string; attributeValueId: string | null }[] } }>(
+      `query ColorImages($pid: ID!) {
+        productImages(pagination: { take: 100 }, filter: { productId: $pid }) {
+          nodes { url attributeValueId }
+        }
+      }`,
+      { pid: productId },
+    )
+      .then(({ productImages }) => {
+        const map: Record<string, string> = {};
+        for (const i of productImages.nodes) {
+          if (i.attributeValueId && !map[i.attributeValueId]) map[i.attributeValueId] = i.url;
+        }
+        setColorImages(map);
+      })
+      .catch(() => setColorImages({}));
+  }, [productId, imagesToken]);
+
+  const colorAttributeId = attributes.find((a) => a.name === "Màu sắc")?.id;
+
+  /** Id giá trị màu của một tổ hợp (null nếu tổ hợp không có màu / màu chưa tồn tại). */
+  function colorValueId(combo: Combo): string | null {
+    const text = combo.options.find((o) => o.attributeId === colorAttributeId)?.value;
+    if (!text) return null;
+    const attr = attributes.find((a) => a.id === colorAttributeId);
+    return attr?.values.find((v) => v.value === text)?.id ?? null;
+  }
+
+  function imageFor(combo: Combo): string | null {
+    const id = colorValueId(combo);
+    return id ? (colorImages[id] ?? null) : null;
   }
 
   function applyBulk() {
@@ -233,7 +261,6 @@ export function ProductVariantSection({
         price: Number(r.price),
         stockQuantity: Number(r.stock) || 0,
         isActive: true,
-        imageUrl: r.image || null,
         options: c.options,
       });
     }
@@ -266,6 +293,7 @@ export function ProductVariantSection({
       );
       await load();
       setSaved(true);
+      onSaved?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Lưu biến thể thất bại");
     } finally {
@@ -348,10 +376,9 @@ export function ProductVariantSection({
               key={c.key}
               combo={c}
               row={resolveRow(rows, c)}
-              uploading={uploadingKey === c.key}
-              uploadDisabled={uploadingKey !== null}
+              imageUrl={imageFor(c)}
+              missingImage={Boolean(productId) && colorValueId(c) !== null && !imageFor(c)}
               onPatch={(patch) => patchRow(c, patch)}
-              onPickImage={(file) => void onPickImage(c, file)}
             />
           ))}
         </div>

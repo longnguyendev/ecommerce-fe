@@ -17,7 +17,6 @@ export interface Variant {
   stockQuantity: number;
   isActive: boolean;
   attributes: VariantAttr[];
-  images: { url: string }[];
 }
 
 /** Một thuộc tính đang dùng + danh sách giá trị (text) của nó. */
@@ -30,8 +29,6 @@ export interface RowData {
   sku: string;
   price: string;
   stock: string;
-  /** Ảnh đại diện của biến thể (URL), "" = không có. */
-  image: string;
 }
 export interface Combo {
   key: string;
@@ -42,7 +39,6 @@ export interface Combo {
 export const VARIANT_FIELDS = `
   id sku price compareAtPrice stockQuantity isActive
   attributes { attribute { id name } attributeValue { id value } }
-  images { url }
 `;
 
 export const DEFAULT_KEY = "__default__";
@@ -52,7 +48,6 @@ export interface DraftVariant {
   price: number;
   stockQuantity: number;
   isActive: boolean;
-  imageUrl: string | null;
   options: { attributeId: string; value: string }[];
 }
 /** Kết quả dựng biến thể để lưu (dùng cho chế độ tạo sản phẩm mới). */
@@ -83,7 +78,7 @@ export function buildCombos(options: Option[]): Combo[] {
   }));
 }
 
-export const EMPTY_ROW: RowData = { sku: "", price: "", stock: "0", image: "" };
+export const EMPTY_ROW: RowData = { sku: "", price: "", stock: "0" };
 
 /**
  * Lấy dữ liệu dòng cho một tổ hợp. Nếu chưa có dòng khớp chính xác (vì vừa thêm/bớt

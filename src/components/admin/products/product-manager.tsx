@@ -62,6 +62,9 @@ export function ProductManager() {
 
   // Dữ liệu ảnh/biến thể nhập khi tạo sản phẩm mới (lưu cùng lúc với sản phẩm).
   const [formKey, setFormKey] = useState(0);
+  // Đồng bộ giữa mục ảnh (gán màu) và mục biến thể (hiện ảnh theo màu).
+  const [variantsVersion, setVariantsVersion] = useState(0);
+  const [imagesVersion, setImagesVersion] = useState(0);
   const draftImages = useRef<string[]>([]);
   const draftVariants = useRef<DraftResult | null>(null);
   const onDraftImages = useCallback((urls: string[]) => {
@@ -384,12 +387,16 @@ export function ProductManager() {
             key={`img-${editingId ?? `new-${formKey}`}`}
             productId={editingId}
             onDraftChange={onDraftImages}
+            reloadToken={variantsVersion}
+            onChange={() => setImagesVersion((v) => v + 1)}
           />
           <ProductVariantSection
             key={`var-${editingId ?? `new-${formKey}`}`}
             productId={editingId}
             skuPrefix={slug || slugify(name)}
             onDraftChange={onDraftVariants}
+            imagesToken={imagesVersion}
+            onSaved={() => setVariantsVersion((v) => v + 1)}
           />
         </div>
       ) : null}

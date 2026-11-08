@@ -10,10 +10,16 @@ import { gql, resolveImageUrl, uploadImage } from "@/lib/admin/client";
 interface Img {
   id: string;
   url: string;
-  variantId: string | null;
+  /** Màu của ảnh (AttributeValue); null = ảnh chung của sản phẩm. */
+  attributeValueId: string | null;
 }
 
-const FIELDS = "id url variantId";
+export interface ColorChoice {
+  id: string;
+  name: string;
+}
+
+const FIELDS = "id url attributeValueId";
 
 /**
  * - Có `productId`: thao tác trực tiếp với API.
@@ -23,9 +29,15 @@ const FIELDS = "id url variantId";
 export function ProductImagesSection({
   productId,
   onDraftChange,
+  onChange,
+  reloadToken = 0,
 }: {
   productId?: string | null;
   onDraftChange?: (urls: string[]) => void;
+  /** Gọi khi danh sách ảnh / màu của ảnh thay đổi (để bảng biến thể cập nhật ảnh). */
+  onChange?: () => void;
+  /** Tăng giá trị này để nạp lại danh sách màu (sau khi lưu biến thể). */
+  reloadToken?: number;
 }) {
   const [confirm, confirmDialog] = useConfirm();
   const [images, setImages] = useState<Img[]>([]);
@@ -35,6 +47,7 @@ export function ProductImagesSection({
   const [showUrl, setShowUrl] = useState(false);
   const [urlDraft, setUrlDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [colors, setColors] = useState<ColorChoice[]>([]);
 
   const load = useCallback(async () => {
     if (!productId) return;
@@ -47,8 +60,7 @@ export function ProductImagesSection({
         }`,
         { pid: productId },
       );
-      // Chỉ quản lý ảnh chung của sản phẩm (ảnh riêng biến thể để nguyên).
-      setImages(data.productImages.nodes.filter((i) => !i.variantId));
+      setImages(data.productImages.nodes);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Tải ảnh thất bại");
     }
@@ -57,6 +69,52 @@ export function ProductImagesSection({
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Các màu của sản phẩm = giá trị thuộc tính "Màu sắc" của các biến thể đã lưu.
+  useEffect(() => {
+    if (!productId) return;
+    void gql<{
+      product: {
+        variants: {
+          attributes: {
+            attribute: { name: string };
+            attributeValue: { id: string; value: string };
+          }[];
+        }[];
+      };
+    }>(
+      `query Colors($id: ID!) { product(id: $id) { variants { attributes { attribute { name } attributeValue { id value } } } } }`,
+      { id: productId },
+    )
+      .then(({ product }) => {
+        const map = new Map<string, string>();
+        for (const v of product.variants)
+          for (const a of v.attributes)
+            if (a.attribute.name === "Màu sắc")
+              map.set(a.attributeValue.id, a.attributeValue.value);
+        setColors([...map.entries()].map(([id, name]) => ({ id, name })));
+      })
+      .catch(() => setColors([]));
+  }, [productId, reloadToken]);
+
+  const signature = images.map((i) => `${i.id}:${i.attributeValueId ?? ""}`).join("|");
+  useEffect(() => {
+    if (productId) onChange?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId, signature]);
+
+  async function setImageColor(img: Img, attributeValueId: string | null) {
+    setImages((prev) => prev.map((i) => (i.id === img.id ? { ...i, attributeValueId } : i)));
+    try {
+      await gql(
+        `mutation SetColor($input: UpdateProductImageInput!) { updateProductImage(input: $input) { id } }`,
+        { input: { id: img.id, attributeValueId } },
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gán màu cho ảnh thất bại");
+      await load();
+    }
+  }
 
   useEffect(() => {
     if (!productId) onDraftChange?.(images.map((i) => i.url));
@@ -85,7 +143,7 @@ export function ProductImagesSection({
         ...urls.map((url, i) => ({
           id: `draft-${Date.now()}-${i}`,
           url,
-          variantId: null,
+          attributeValueId: null,
         })),
       ]);
       return;
@@ -179,6 +237,9 @@ export function ProductImagesSection({
       <h2 className="mb-1 text-[15px] font-medium">Hình ảnh sản phẩm</h2>
       <p className="mb-4 text-[12px] text-muted-foreground">
         Ảnh đầu tiên là ảnh đại diện. Kéo thả ảnh lên vị trí đầu để đặt làm ảnh đại diện.
+        {productId
+          ? " Gán mỗi ảnh cho một màu để khách chọn màu nào thấy đúng ảnh màu đó; ảnh “Chung” hiện cho mọi màu."
+          : " Sau khi lưu sản phẩm, bạn có thể gán ảnh cho từng màu."}
       </p>
 
       {error ? (
@@ -227,6 +288,23 @@ export function ProductImagesSection({
               <span className="absolute left-2 top-2 rounded bg-foreground px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-background">
                 Ảnh đại diện
               </span>
+            ) : null}
+            {productId && colors.length > 0 ? (
+              <select
+                value={img.attributeValueId ?? ""}
+                onChange={(e) => void setImageColor(img, e.target.value || null)}
+                onMouseDown={(e) => e.stopPropagation()}
+                draggable={false}
+                aria-label="Màu của ảnh"
+                className="absolute inset-x-1 bottom-1 h-7 rounded border border-border bg-background/95 px-1 text-[11px] outline-none"
+              >
+                <option value="">Chung (mọi màu)</option>
+                {colors.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
             ) : null}
             <button
               type="button"

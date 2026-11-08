@@ -85,7 +85,7 @@ async function gql<T>(query: string, variables?: Record<string, unknown>): Promi
 
 interface GqlAttribute {
   attribute: { name: string };
-  attributeValue: { value: string };
+  attributeValue: { id: string; value: string };
 }
 interface GqlVariant {
   id: string;
@@ -95,7 +95,6 @@ interface GqlVariant {
   stockQuantity: number;
   isActive: boolean;
   attributes: GqlAttribute[];
-  images?: { url: string }[];
 }
 interface GqlProduct {
   id: string;
@@ -106,7 +105,7 @@ interface GqlProduct {
   status: string;
   category: { name: string };
   collections: { slug: string }[];
-  images: { url: string; isPrimary: boolean; variantId?: string | null }[];
+  images: { url: string; isPrimary: boolean; attributeValueId: string | null }[];
   variants: GqlVariant[];
 }
 
@@ -140,18 +139,22 @@ export function mapProduct(p: GqlProduct): Product {
   const activeVariants = p.variants.filter((v) => v.isActive);
   const first = activeVariants[0] ?? p.variants[0];
 
-  // Mỗi màu = các biến thể cùng màu; ảnh riêng của màu lấy từ ảnh của các biến thể đó,
+  // Mỗi màu = các biến thể cùng màu; ảnh của màu = ảnh trong thư viện gắn với màu đó,
   // giá = giá thấp nhất trong các biến thể đang bán của màu.
   const byColor = new Map<
     string,
     { images: string[]; price?: number; compareAt?: number | null }
   >();
   for (const v of p.variants) {
-    const name = v.attributes.find((a) => a.attribute.name === "Màu sắc")?.attributeValue.value;
+    const colorAttr = v.attributes.find((a) => a.attribute.name === "Màu sắc");
+    const name = colorAttr?.attributeValue.value;
     if (!name) continue;
     const entry = byColor.get(name) ?? { images: [] };
-    for (const img of v.images ?? []) {
-      if (!entry.images.includes(img.url)) entry.images.push(img.url);
+    // Ảnh của màu = ảnh trong thư viện gắn với giá trị màu này (dùng chung cho mọi biến thể cùng màu).
+    for (const img of p.images) {
+      if (img.attributeValueId && img.attributeValueId === colorAttr.attributeValue.id) {
+        if (!entry.images.includes(img.url)) entry.images.push(img.url);
+      }
     }
     if (v.isActive && (entry.price === undefined || v.price < entry.price)) {
       entry.price = v.price;
@@ -167,8 +170,8 @@ export function mapProduct(p: GqlProduct): Product {
     compareAt: e.compareAt ?? null,
   }));
 
-  // Thư viện ảnh chung = ảnh không gắn biến thể (nếu có).
-  const shared = p.images.filter((i) => !i.variantId);
+  // Thư viện ảnh chung = ảnh không gắn màu (nếu có), dùng cho mọi màu.
+  const shared = p.images.filter((i) => !i.attributeValueId);
   const gallery = (shared.length > 0 ? shared : p.images).map((i) => resolveImageUrl(i.url));
 
   return {
@@ -192,10 +195,9 @@ const PRODUCT_FIELDS = `
   id name slug description thumbnail status
   category { name }
   collections { slug }
-  images { url isPrimary variantId }
+  images { url isPrimary attributeValueId }
   variants { id sku price compareAtPrice stockQuantity isActive
-    attributes { attribute { name } attributeValue { value } }
-    images { url } }
+    attributes { attribute { name } attributeValue { id value } } }
 `;
 
 export async function fetchProducts(

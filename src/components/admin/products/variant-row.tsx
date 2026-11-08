@@ -2,58 +2,51 @@ import { formatVnd, type Combo, type RowData } from "@/components/admin/products
 import { Input } from "@/components/ui/input";
 import { resolveImageUrl } from "@/lib/admin/client";
 
+/** Một dòng biến thể. Ảnh hiển thị là ảnh theo MÀU của biến thể (quản lý ở mục Hình ảnh sản phẩm). */
 export function VariantRow({
   combo,
   row: r,
-  uploading,
-  uploadDisabled,
+  imageUrl,
+  missingImage,
   onPatch,
-  onPickImage,
 }: {
   combo: Combo;
   row: RowData;
-  uploading: boolean;
-  uploadDisabled: boolean;
+  /** Ảnh của màu biến thể này (nếu có). */
+  imageUrl: string | null;
+  /** Biến thể có màu nhưng màu đó chưa có ảnh nào. */
+  missingImage: boolean;
   onPatch: (patch: Partial<RowData>) => void;
-  onPickImage: (file: File | undefined) => void;
 }) {
   return (
     <div className="grid grid-cols-2 items-center gap-2 py-3 sm:grid-cols-[56px_1.2fr_1.2fr_1fr_0.8fr]">
-      <div className="relative h-12 w-12">
-        {r.image ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={resolveImageUrl(r.image)}
-              alt=""
-              className="h-12 w-12 rounded border border-border object-cover"
-            />
-            <button
-              type="button"
-              onClick={() => onPatch({ image: "" })}
-              aria-label="Xoá ảnh biến thể"
-              className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[11px] leading-none text-background"
-            >
-              ×
-            </button>
-          </>
+      <div
+        className="h-12 w-12"
+        title={
+          imageUrl
+            ? "Ảnh theo màu (đổi ở mục Hình ảnh sản phẩm)"
+            : missingImage
+              ? "Màu này chưa có ảnh — gán ảnh cho màu ở mục Hình ảnh sản phẩm"
+              : undefined
+        }
+      >
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={resolveImageUrl(imageUrl)}
+            alt=""
+            className="h-12 w-12 rounded border border-border object-cover"
+          />
         ) : (
-          <label
-            title="Thêm ảnh đại diện cho biến thể"
-            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded border border-dashed border-border text-center text-[10px] leading-tight text-blue-600 hover:bg-muted"
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded border border-dashed text-center text-[9px] leading-tight ${
+              missingImage
+                ? "border-amber-500 text-amber-600"
+                : "border-border text-muted-foreground"
+            }`}
           >
-            {uploading ? "…" : "+ Ảnh"}
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={uploadDisabled}
-              onChange={(e) => {
-                onPickImage(e.target.files?.[0]);
-                e.target.value = "";
-              }}
-            />
-          </label>
+            {missingImage ? "Chưa có ảnh" : "—"}
+          </div>
         )}
       </div>
       <div className="col-span-2 text-[13px] font-medium sm:col-span-1">
