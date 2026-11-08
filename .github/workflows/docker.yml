@@ -3,11 +3,7 @@ name: Docker image
 on:
   push:
     branches: [main]
-<<<<<<< HEAD
-    tags: ['v*']
-=======
     tags: ["v*"]
->>>>>>> 8fbb39c (feat: update worlflow)
   pull_request:
   workflow_dispatch:
 
