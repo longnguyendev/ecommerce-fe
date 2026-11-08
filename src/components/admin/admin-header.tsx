@@ -9,6 +9,7 @@ import { clearToken } from "@/lib/admin/client";
 const NAV = [
   { href: "/admin/products", label: "Sản phẩm" },
   { href: "/admin/categories", label: "Danh mục" },
+  { href: "/admin/collections", label: "Bộ sưu tập" },
   { href: "/admin/attributes", label: "Thuộc tính" },
 ];
 

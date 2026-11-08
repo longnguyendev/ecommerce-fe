@@ -46,3 +46,8 @@ export const INSTAGRAM = [
     caption: "Doing my stretches, drinking my water, keeping my day quiet.",
   },
 ];
+
+/** Hai tile cố định đầu dải bộ sưu tập ở /products; các tile còn lại lấy từ API (Collection). */
+export const ALL_TILE = { slug: "", label: "Tất cả", image: "/images/collections/tat-ca.webp" };
+export const NEW_TILE = { slug: "moi", label: "Mới", image: "/images/collections/moi.webp" };
+export const NEW_PRODUCT_COUNT = 24;

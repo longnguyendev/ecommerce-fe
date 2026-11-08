@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { useConfirm } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { gql, resolveImageUrl, uploadImage } from "@/lib/admin/client";
@@ -26,6 +27,7 @@ export function ProductImagesSection({
   productId?: string | null;
   onDraftChange?: (urls: string[]) => void;
 }) {
+  const [confirm, confirmDialog] = useConfirm();
   const [images, setImages] = useState<Img[]>([]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
@@ -142,7 +144,7 @@ export function ProductImagesSection({
   }
 
   async function onRemove(img: Img) {
-    if (!window.confirm("Xoá ảnh này?")) return;
+    if (!(await confirm({ title: "Xoá ảnh này?" }))) return;
     setError(null);
     try {
       if (productId) {
@@ -302,6 +304,7 @@ export function ProductImagesSection({
           )}
         </div>
       </div>
+      {confirmDialog}
     </div>
   );
 }

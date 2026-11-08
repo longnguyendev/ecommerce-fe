@@ -49,6 +49,8 @@ export function ProductCardView({
   const shownPrice = current?.priceText ?? priceText;
   const shownCompareAt = current ? current.compareAtText : compareAtText;
   const shownDiscount = current ? current.discountPercent : discountPercent;
+  // Tên hiển thị kèm màu đang chọn: "Air Bra - Navy".
+  const displayName = current ? `${name} - ${current.name}` : name;
   const base = `/products/${slug}`;
   const href = touched && current ? `${base}?color=${encodeURIComponent(current.name)}` : base;
 
@@ -57,7 +59,7 @@ export function ProductCardView({
       <ProductImageCarousel
         key={`${selected}-${shownImages[0] ?? ""}`}
         images={shownImages}
-        name={name}
+        name={displayName}
         href={href}
         badge={badge}
         discountPercent={shownDiscount}
@@ -66,7 +68,7 @@ export function ProductCardView({
       <div className="mt-3 px-0.5">
         <div className="flex items-start justify-between gap-2">
           <Link href={href} className="min-w-0 flex-1">
-            <h2 className="line-clamp-1 text-[13px] font-normal text-foreground">{name}</h2>
+            <h2 className="line-clamp-1 text-[13px] font-normal text-foreground">{displayName}</h2>
           </Link>
           <span className="shrink-0 text-muted-foreground" aria-hidden="true">
             <svg

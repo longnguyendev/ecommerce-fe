@@ -18,6 +18,7 @@ import {
   ProductVariantSection,
   type DraftResult,
 } from "@/components/admin/products/product-variant-section";
+import { useConfirm } from "@/components/shared/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ import {
   isAuthenticated,
   resolveImageUrl,
   type AdminCategory,
+  type AdminCollection,
   type AdminProduct,
   type ProductStatus,
 } from "@/lib/admin/client";
@@ -36,6 +38,9 @@ const PAGE_SIZE = 20;
 export function ProductManager() {
   const router = useRouter();
 
+  const [confirm, confirmDialog] = useConfirm();
+  const [collections, setCollections] = useState<AdminCollection[]>([]);
+  const [collectionIds, setCollectionIds] = useState<string[]>([]);
   const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [total, setTotal] = useState(0);
@@ -74,6 +79,10 @@ export function ProductManager() {
     );
     setCategories(data.categories.nodes);
     setCategoryId((prev) => prev || data.categories.nodes[0]?.id || "");
+    const col = await gql<{ collections: AdminCollection[] }>(
+      `query { collections { id name slug image sortOrder } }`,
+    );
+    setCollections(col.collections);
   }, []);
 
   const loadProducts = useCallback(async () => {
@@ -141,6 +150,7 @@ export function ProductManager() {
     setSlug("");
     setDescription("");
     setStatus("ACTIVE");
+    setCollectionIds([]);
     setShowForm(true);
   }
 
@@ -150,7 +160,24 @@ export function ProductManager() {
     setSlug(p.slug);
     setDescription("");
     setStatus(p.status);
+    setCollectionIds([]);
     setShowForm(true);
+    // Nạp các trường danh sách không có sẵn (danh mục, mô tả, collection).
+    void gql<{
+      product: {
+        categoryId: string;
+        description: string | null;
+        collections: { id: string }[];
+      };
+    }>(`query P($id: ID!) { product(id: $id) { categoryId description collections { id } } }`, {
+      id: p.id,
+    })
+      .then(({ product }) => {
+        setCategoryId(product.categoryId);
+        setDescription(product.description ?? "");
+        setCollectionIds(product.collections.map((c) => c.id));
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : "Tải sản phẩm thất bại"));
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -165,6 +192,7 @@ export function ProductManager() {
         slug: finalSlug,
         description: description || undefined,
         status,
+        collectionIds,
       };
 
       if (editingId) {
@@ -225,7 +253,13 @@ export function ProductManager() {
   }
 
   async function onDelete(p: AdminProduct) {
-    if (!window.confirm(`Xoá sản phẩm "${p.name}"?`)) return;
+    if (
+      !(await confirm({
+        title: `Xoá sản phẩm "${p.name}"?`,
+        message: "Sản phẩm và các biến thể sẽ bị xoá.",
+      }))
+    )
+      return;
     setBusy(true);
     setError(null);
     try {
@@ -310,6 +344,28 @@ export function ProductManager() {
                 className={textareaClass}
                 placeholder="Mô tả sản phẩm…"
               />
+            </Field>
+            <Field label="Bộ sưu tập" className="sm:col-span-2">
+              <div className="flex flex-wrap gap-x-5 gap-y-2">
+                {collections.length === 0 ? (
+                  <span className="text-[12px] text-muted-foreground">Chưa có bộ sưu tập nào.</span>
+                ) : null}
+                {collections.map((c) => (
+                  <label key={c.id} className="flex items-center gap-2 text-[13px]">
+                    <input
+                      type="checkbox"
+                      checked={collectionIds.includes(c.id)}
+                      onChange={(e) =>
+                        setCollectionIds((prev) =>
+                          e.target.checked ? [...prev, c.id] : prev.filter((x) => x !== c.id),
+                        )
+                      }
+                      className="h-4 w-4"
+                    />
+                    {c.name}
+                  </label>
+                ))}
+              </div>
             </Field>
             <Field label="Trạng thái">
               <select
@@ -397,6 +453,7 @@ export function ProductManager() {
       ) : null}
 
       <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+      {confirmDialog}
     </AdminShell>
   );
 }

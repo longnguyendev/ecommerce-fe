@@ -105,6 +105,7 @@ interface GqlProduct {
   thumbnail: string | null;
   status: string;
   category: { name: string };
+  collections: { slug: string }[];
   images: { url: string; isPrimary: boolean; variantId?: string | null }[];
   variants: GqlVariant[];
 }
@@ -183,12 +184,14 @@ export function mapProduct(p: GqlProduct): Product {
     colorOptions,
     badge: null,
     description: p.description,
+    collections: p.collections.map((c) => c.slug),
   };
 }
 
 const PRODUCT_FIELDS = `
   id name slug description thumbnail status
   category { name }
+  collections { slug }
   images { url isPrimary variantId }
   variants { id sku price compareAtPrice stockQuantity isActive
     attributes { attribute { name } attributeValue { value } }
@@ -242,4 +245,20 @@ export async function fetchProductDetail(
     product: mapProduct(data.productBySlug),
     variants: data.productBySlug.variants.filter((v) => v.isActive).map(mapVariant),
   };
+}
+
+export interface StoreCollection {
+  slug: string;
+  name: string;
+  image: string | null;
+}
+
+export async function fetchCollections(): Promise<StoreCollection[]> {
+  const data = await gql<{ collections: StoreCollection[] }>(
+    `query { collections { slug name image } }`,
+  );
+  return data.collections.map((c) => ({
+    ...c,
+    image: c.image ? resolveImageUrl(c.image) : null,
+  }));
 }

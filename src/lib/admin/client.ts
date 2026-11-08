@@ -172,6 +172,14 @@ export interface AdminCategory {
   slug: string;
 }
 
+export interface AdminCollection {
+  id: string;
+  name: string;
+  slug: string;
+  image: string | null;
+  sortOrder: number;
+}
+
 export interface AdminProduct {
   id: string;
   name: string;

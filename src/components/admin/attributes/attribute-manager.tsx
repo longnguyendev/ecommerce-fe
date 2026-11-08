@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Field, FormCard, RowActions } from "@/components/admin/form-controls";
+import { useConfirm } from "@/components/shared/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,7 @@ export function AttributeManager() {
     run,
   } = useAdminList(fetchAttributes, "Tải thuộc tính thất bại");
 
+  const [confirm, confirmDialog] = useConfirm();
   const [name, setName] = useState("");
   const [values, setValues] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -90,14 +92,20 @@ export function AttributeManager() {
   }
 
   async function deleteValue(v: AttributeValue) {
-    if (!window.confirm(`Xoá giá trị "${v.value}"?`)) return;
+    if (!(await confirm({ title: `Xoá giá trị "${v.value}"?` }))) return;
     await run(async () => {
       await gql(`mutation DeleteValue($id: ID!) { deleteAttributeValue(id: $id) }`, { id: v.id });
     }, "Xoá giá trị thất bại");
   }
 
   async function deleteAttr(a: Attribute) {
-    if (!window.confirm(`Xoá thuộc tính "${a.name}"?`)) return;
+    if (
+      !(await confirm({
+        title: `Xoá thuộc tính "${a.name}"?`,
+        message: "Các giá trị của thuộc tính cũng bị xoá.",
+      }))
+    )
+      return;
     await run(async () => {
       await gql(`mutation DeleteAttr($id: ID!) { deleteAttribute(id: $id) }`, {
         id: a.id,
@@ -187,6 +195,7 @@ export function AttributeManager() {
           </div>
         ))}
       </div>
+      {confirmDialog}
     </AdminShell>
   );
 }

@@ -9,8 +9,6 @@ import { formatPrice, type Product } from "@/lib/catalog";
 import { isLocalImage } from "@/lib/image-url";
 import { colorHex, type StoreVariant } from "@/lib/storefront/api";
 
-const FALLBACK_SIZES = ["S", "M", "L", "XL"];
-
 function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
@@ -60,7 +58,16 @@ export function ProductDetail({
 
   const hasSize = sizes.length > 0;
   const hasColor = colorNames.length > 0;
-  const sizeOptions = hasSize ? sizes : FALLBACK_SIZES;
+  // Chỉ hiện các size thật của sản phẩm (theo màu đang chọn); hết hàng thì làm mờ.
+  const sizeOptions = useMemo(() => {
+    const byColor = hasColor ? variants.filter((v) => v.color === color) : variants;
+    const map = new Map<string, boolean>();
+    for (const v of byColor) {
+      if (!v.size) continue;
+      map.set(v.size, (map.get(v.size) ?? false) || v.stockQuantity > 0);
+    }
+    return [...map.entries()].map(([name, inStock]) => ({ name, inStock }));
+  }, [variants, color, hasColor]);
 
   const selectedVariant = useMemo(
     () =>
@@ -70,6 +77,7 @@ export function ProductDetail({
     [variants, size, color, hasSize, hasColor],
   );
 
+  const displayName = color ? `${product.name} - ${color}` : product.name;
   const colorOption = product.colorOptions?.find((o) => o.name === color);
   const price = selectedVariant?.price ?? colorOption?.price ?? product.price;
   const compareAt =
@@ -101,7 +109,7 @@ export function ProductDetail({
         <div className="relative aspect-[4/5] overflow-hidden bg-muted">
           <Image
             src={gallery[active] ?? gallery[0]}
-            alt={product.name}
+            alt={displayName}
             fill
             priority
             sizes="(min-width:1024px) 55vw, 100vw"
@@ -145,7 +153,7 @@ export function ProductDetail({
         </nav>
 
         <h1 className="mt-3 text-[clamp(22px,2.4vw,30px)] font-medium tracking-[-0.02em]">
-          {product.name}
+          {displayName}
         </h1>
 
         <div className="mt-2.5 flex items-center gap-3">
@@ -171,6 +179,7 @@ export function ProductDetail({
                   title={s.name}
                   onClick={() => {
                     setColor(hasColor ? s.name : null);
+                    setSize(null);
                     setActive(0);
                     setError(false);
                   }}
@@ -184,33 +193,40 @@ export function ProductDetail({
           </div>
         ) : null}
 
-        <div className="mt-6">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-            Kích thước
-          </p>
-          <div className="mt-2 flex gap-2">
-            {sizeOptions.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => {
-                  setSize(s);
-                  setError(false);
-                }}
-                className={`h-9 min-w-[44px] border px-3 text-[12px] transition-colors ${
-                  size === s
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border text-foreground hover:border-foreground"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+        {hasSize ? (
+          <div className="mt-6">
+            <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              Kích thước{size ? ` · ${size}` : ""}
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {sizeOptions.map((o) => (
+                <button
+                  key={o.name}
+                  type="button"
+                  disabled={!o.inStock}
+                  onClick={() => {
+                    setSize(o.name);
+                    setError(false);
+                  }}
+                  className={`h-9 min-w-[44px] border px-3 text-[12px] transition-colors disabled:cursor-not-allowed disabled:text-[#bbb] disabled:line-through ${
+                    size === o.name
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border text-foreground hover:border-foreground"
+                  }`}
+                >
+                  {o.name}
+                </button>
+              ))}
+            </div>
           </div>
-          {error ? (
-            <p className="mt-2 text-[12px] text-destructive">Vui lòng chọn đầy đủ size / màu</p>
-          ) : null}
-        </div>
+        ) : null}
+        {error ? (
+          <p className="mt-2 text-[12px] text-destructive">
+            Vui lòng chọn đầy đủ {hasSize ? "size" : ""}
+            {hasSize && hasColor ? " / " : ""}
+            {hasColor ? "màu" : ""}
+          </p>
+        ) : null}
 
         <div className="mt-6">
           <Button

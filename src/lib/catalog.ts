@@ -21,6 +21,8 @@ export type Product = {
   colorOptions?: ColorOption[];
   badge: string | null;
   description?: string | null;
+  /** Slug các bộ sưu tập chứa sản phẩm. */
+  collections?: string[];
 };
 
 /* ---------------------------------------------------------------- prices */
