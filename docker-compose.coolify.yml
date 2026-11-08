@@ -1,0 +1,32 @@
+# Coolify (Docker Compose build pack) cho storefront + admin (Next.js).
+#
+# Cách dùng trên Coolify:
+#   1. New Resource -> Docker Compose -> chọn repo app, Compose file: /docker-compose.coolify.yml
+#   2. Đặt NEXT_PUBLIC_API_URL = URL công khai của API (vd: https://api.example.com).
+#      Biến này được nhúng lúc build -> đổi giá trị thì phải Redeploy (build lại).
+#   3. Gán domain cho service `web` (cổng 3400) trong tab Domains, rồi đặt FE_HOST của
+#      repo ecommerce-be bằng đúng domain này (CORS).
+#
+# Không publish `ports`: Coolify (Traefik) tự proxy tới cổng 3400.
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required}
+    environment:
+      # Coolify tự sinh domain cho service này (có thể đổi trong tab Domains).
+      SERVICE_FQDN_WEB_3400: ""
+      NODE_ENV: production
+      PORT: 3400
+      HOSTNAME: 0.0.0.0
+    expose:
+      - "3400"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3400/ >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    restart: unless-stopped
