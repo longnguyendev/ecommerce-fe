@@ -24,6 +24,54 @@ export function Field({
   );
 }
 
+const actionButtonClass = "h-10 rounded-none text-xs uppercase tracking-[0.1em]";
+
+/** Nút lưu chuẩn của mọi form/mục quản trị: tự đổi nhãn "Đang lưu…" và khoá khi đang lưu. */
+export function SaveButton({
+  busy,
+  children = "Lưu",
+  busyLabel = "Đang lưu…",
+  type = "button",
+  disabled,
+  onClick,
+}: {
+  busy: boolean;
+  children?: React.ReactNode;
+  busyLabel?: string;
+  type?: "button" | "submit";
+  disabled?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <Button type={type} onClick={onClick} disabled={busy || disabled} className={actionButtonClass}>
+      {busy ? busyLabel : children}
+    </Button>
+  );
+}
+
+/** Nút phụ (Huỷ / Hoàn tác) cùng kích thước với SaveButton. */
+export function SecondaryButton({
+  children,
+  disabled,
+  onClick,
+}: {
+  children: React.ReactNode;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onClick}
+      disabled={disabled}
+      className="h-10 rounded-none text-xs"
+    >
+      {children}
+    </Button>
+  );
+}
+
 /** Thẻ form có tiêu đề + nút Huỷ/Lưu. */
 export function FormCard({
   title,
@@ -45,23 +93,10 @@ export function FormCard({
       <h2 className="mb-4 text-[13px] uppercase tracking-[0.12em]">{title}</h2>
       <div className="grid gap-4 sm:grid-cols-2">{children}</div>
       <div className="mt-4 flex justify-end gap-3">
-        {onCancel ? (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            className="h-10 rounded-none text-xs"
-          >
-            Huỷ
-          </Button>
-        ) : null}
-        <Button
-          type="submit"
-          disabled={busy}
-          className="h-10 rounded-none text-xs uppercase tracking-[0.1em]"
-        >
-          {busy ? "Đang lưu…" : submitLabel}
-        </Button>
+        {onCancel ? <SecondaryButton onClick={onCancel}>Huỷ</SecondaryButton> : null}
+        <SaveButton type="submit" busy={busy}>
+          {submitLabel}
+        </SaveButton>
       </div>
     </form>
   );

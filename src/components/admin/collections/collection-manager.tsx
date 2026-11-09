@@ -74,19 +74,24 @@ export function CollectionManager() {
       image: image || undefined,
       sortOrder: Number(sortOrder) || 0,
     };
-    const ok = await run(async () => {
-      if (editingId) {
-        await gql(
-          `mutation UpdateCollection($input: UpdateCollectionInput!) { updateCollection(input: $input) { id } }`,
-          { input: { id: editingId, ...input } },
-        );
-      } else {
-        await gql(
-          `mutation CreateCollection($input: CreateCollectionInput!) { createCollection(input: $input) { id } }`,
-          { input },
-        );
-      }
-    }, "Lưu bộ sưu tập thất bại");
+    const ok = await run(
+      async () => {
+        if (editingId) {
+          await gql(
+            `mutation UpdateCollection($input: UpdateCollectionInput!) { updateCollection(input: $input) { id } }`,
+            { input: { id: editingId, ...input } },
+          );
+        } else {
+          await gql(
+            `mutation CreateCollection($input: CreateCollectionInput!) { createCollection(input: $input) { id } }`,
+            { input },
+          );
+        }
+      },
+      "Lưu bộ sưu tập thất bại",
+      true,
+      editingId ? "Đã lưu bộ sưu tập" : "Đã tạo bộ sưu tập",
+    );
     if (ok) reset();
   }
 
@@ -98,9 +103,16 @@ export function CollectionManager() {
       }))
     )
       return;
-    await run(async () => {
-      await gql(`mutation DeleteCollection($id: ID!) { deleteCollection(id: $id) }`, { id: c.id });
-    }, "Xoá bộ sưu tập thất bại");
+    await run(
+      async () => {
+        await gql(`mutation DeleteCollection($id: ID!) { deleteCollection(id: $id) }`, {
+          id: c.id,
+        });
+      },
+      "Xoá bộ sưu tập thất bại",
+      true,
+      "Đã xoá bộ sưu tập",
+    );
   }
 
   return (

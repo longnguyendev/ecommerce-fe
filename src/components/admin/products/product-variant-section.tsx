@@ -1,7 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
+import { SaveButton } from "@/components/admin/form-controls";
+import { ProductImagesSection } from "@/components/admin/products/product-images-section";
 import {
   buildCombos,
   comboKey,
@@ -18,10 +21,12 @@ import {
 } from "@/components/admin/products/variant-logic";
 import { VariantOptionsEditor } from "@/components/admin/products/variant-options-editor";
 import { VariantRow } from "@/components/admin/products/variant-row";
+import { useConfirm } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { gql } from "@/lib/admin/client";
 import { slugify } from "@/lib/slugify";
+import { toast } from "@/lib/toast";
 
 export type { DraftResult, DraftVariant };
 
@@ -34,26 +39,26 @@ export function ProductVariantSection({
   productId,
   skuPrefix,
   onDraftChange,
-  onSaved,
-  imagesToken = 0,
+  onDraftImages,
 }: {
   productId?: string | null;
   skuPrefix?: string;
   onDraftChange?: (result: DraftResult) => void;
-  /** Gọi sau khi lưu biến thể thành công (để mục ảnh nạp lại danh sách màu). */
-  onSaved?: () => void;
-  /** Tăng giá trị này để nạp lại ảnh theo màu (khi ảnh sản phẩm thay đổi). */
-  imagesToken?: number;
+  /** Chế độ tạo mới: báo danh sách URL ảnh ra form cha (callback KHÔNG được setState). */
+  onDraftImages?: (urls: string[]) => void;
 }) {
+  // Đồng bộ giữa mục ảnh (gán màu) và bảng biến thể (hiện ảnh theo màu).
+  const [variantsVersion, setVariantsVersion] = useState(0);
+  const [imagesToken, setImagesToken] = useState(0);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [hasVariants, setHasVariants] = useState(false);
   const [options, setOptions] = useState<Option[]>([]);
   const [rows, setRows] = useState<Record<string, RowData>>({});
   const [bulkPrice, setBulkPrice] = useState("");
   const [bulkStock, setBulkStock] = useState("");
+  const [confirm, confirmDialog] = useConfirm();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
   /** Ảnh của sản phẩm theo màu: attributeValueId -> url đầu tiên. */
   const [colorImages, setColorImages] = useState<Record<string, string>>({});
   /** Index của option đang mở danh sách gợi ý giá trị. */
@@ -97,6 +102,7 @@ export function ProductVariantSection({
           sku: v.sku,
           price: String(v.price),
           stock: String(v.stockQuantity),
+          stockLocked: true,
         };
       }
       setOptions(nextOptions);
@@ -117,7 +123,6 @@ export function ProductVariantSection({
   const canAddOption = attributes.some((a) => !usedAttributeIds.includes(a.id));
 
   function patchOption(index: number, patch: Partial<Option>) {
-    setSaved(false);
     setOptions((prev) => prev.map((o, i) => (i === index ? { ...o, ...patch } : o)));
   }
 
@@ -127,8 +132,13 @@ export function ProductVariantSection({
     setOptions((prev) => [...prev, { attributeId: next.id, values: [], draft: "" }]);
   }
 
-  function removeOption(index: number) {
-    setSaved(false);
+  async function removeOption(index: number) {
+    const name = attributes.find((a) => a.id === options[index]?.attributeId)?.name;
+    const ok = await confirm({
+      title: `Xoá nhóm biến thể${name ? ` "${name}"` : ""}?`,
+      message: "Các tổ hợp biến thể liên quan sẽ bị gỡ khi bạn bấm “Lưu biến thể”.",
+    });
+    if (!ok) return;
     setOptions((prev) => prev.filter((_, i) => i !== index));
   }
 
@@ -148,14 +158,18 @@ export function ProductVariantSection({
     patchOption(index, { values: [...opt.values, value], draft: "" });
   }
 
-  function removeValue(index: number, value: string) {
+  async function removeValue(index: number, value: string) {
+    const ok = await confirm({
+      title: `Xoá giá trị "${value}"?`,
+      message: "Các biến thể dùng giá trị này sẽ bị gỡ khi bạn bấm “Lưu biến thể”.",
+    });
+    if (!ok) return;
     patchOption(index, {
       values: options[index].values.filter((v) => v !== value),
     });
   }
 
   function patchRow(combo: Combo, patch: Partial<RowData>) {
-    setSaved(false);
     setRows((prev) => ({
       ...prev,
       [combo.key]: { ...resolveRow(prev, combo), ...patch },
@@ -211,7 +225,6 @@ export function ProductVariantSection({
   }
 
   function applyBulk() {
-    setSaved(false);
     setRows((prev) => {
       const next = { ...prev };
       for (const c of combos) {
@@ -219,7 +232,7 @@ export function ProductVariantSection({
         next[c.key] = {
           ...cur,
           price: bulkPrice !== "" ? bulkPrice : cur.price,
-          stock: bulkStock !== "" ? bulkStock : cur.stock,
+          stock: bulkStock !== "" && !rows[c.key]?.stockLocked ? bulkStock : cur.stock,
         };
       }
       return next;
@@ -227,7 +240,6 @@ export function ProductVariantSection({
   }
 
   function toggleHasVariants(checked: boolean) {
-    setSaved(false);
     setHasVariants(checked);
     if (checked && options.length === 0 && attributes.length > 0) {
       setOptions([{ attributeId: attributes[0].id, values: [], draft: "" }]);
@@ -259,7 +271,8 @@ export function ProductVariantSection({
       variants.push({
         sku,
         price: Number(r.price),
-        stockQuantity: Number(r.stock) || 0,
+        // Biến thể đã có: không gửi tồn để không ghi đè số tồn mới từ đơn hàng/phiếu nhập.
+        stockQuantity: rows[c.key]?.stockLocked ? undefined : Number(r.stock) || 0,
         isActive: true,
         options: c.options,
       });
@@ -275,11 +288,11 @@ export function ProductVariantSection({
   async function save() {
     if (!productId) return;
     setError(null);
-    setSaved(false);
 
     const result = buildVariants();
     if ("error" in result) {
       setError(result.error);
+      toast.error(result.error);
       return;
     }
 
@@ -292,10 +305,12 @@ export function ProductVariantSection({
         { input: { productId, variants: result.variants } },
       );
       await load();
-      setSaved(true);
-      onSaved?.();
+      toast.success("Đã lưu biến thể");
+      setVariantsVersion((v) => v + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Lưu biến thể thất bại");
+      const message = err instanceof Error ? err.message : "Lưu biến thể thất bại";
+      setError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -340,7 +355,14 @@ export function ProductVariantSection({
         />
       ) : null}
 
-      <div className="mt-2 border-t border-border pt-4">
+      <ProductImagesSection
+        productId={productId}
+        onDraftChange={onDraftImages}
+        reloadToken={variantsVersion}
+        onChange={() => setImagesToken((v) => v + 1)}
+      />
+
+      <div className="mt-4 border-t border-border pt-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-[13px] font-medium">
             {hasVariants ? `${combos.length} biến thể` : "Giá & tồn kho"}
@@ -378,6 +400,7 @@ export function ProductVariantSection({
               row={resolveRow(rows, c)}
               imageUrl={imageFor(c)}
               missingImage={Boolean(productId) && colorValueId(c) !== null && !imageFor(c)}
+              stockLocked={Boolean(rows[c.key]?.stockLocked)}
               onPatch={(patch) => patchRow(c, patch)}
             />
           ))}
@@ -385,21 +408,16 @@ export function ProductVariantSection({
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <span className="text-[12.5px] text-muted-foreground">
-            Tổng tồn kho: {totalStock} khả dụng
+            Tổng tồn kho: {totalStock} khả dụng ·{" "}
+            <Link href="/admin/inventory" className="underline underline-offset-2">
+              Nhập hàng / điều chỉnh ở trang Kho
+            </Link>
           </span>
           <div className="flex items-center gap-3">
             {productId ? (
-              <>
-                {saved ? <span className="text-[12px] text-green-600">Đã lưu</span> : null}
-                <Button
-                  type="button"
-                  onClick={save}
-                  disabled={busy}
-                  className="h-9 rounded text-xs"
-                >
-                  {busy ? "Đang lưu…" : "Lưu biến thể"}
-                </Button>
-              </>
+              <SaveButton busy={busy} onClick={save}>
+                Lưu biến thể
+              </SaveButton>
             ) : (
               <span className="text-[12px] text-muted-foreground">
                 Biến thể sẽ được lưu cùng sản phẩm.
@@ -408,6 +426,7 @@ export function ProductVariantSection({
           </div>
         </div>
       </div>
+      {confirmDialog}
     </div>
   );
 }

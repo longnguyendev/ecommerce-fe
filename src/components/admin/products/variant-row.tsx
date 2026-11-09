@@ -8,6 +8,7 @@ export function VariantRow({
   row: r,
   imageUrl,
   missingImage,
+  stockLocked = false,
   onPatch,
 }: {
   combo: Combo;
@@ -16,6 +17,8 @@ export function VariantRow({
   imageUrl: string | null;
   /** Biến thể có màu nhưng màu đó chưa có ảnh nào. */
   missingImage: boolean;
+  /** Biến thể đã có: tồn chỉ đọc (đổi ở trang Kho). */
+  stockLocked?: boolean;
   onPatch: (patch: Partial<RowData>) => void;
 }) {
   return (
@@ -76,8 +79,10 @@ export function VariantRow({
         min={0}
         value={r.stock}
         onChange={(e) => onPatch({ stock: e.target.value })}
-        placeholder="Tồn kho"
-        className="h-8 rounded text-[12.5px]"
+        placeholder="Tồn đầu kỳ"
+        readOnly={stockLocked}
+        title={stockLocked ? "Đổi tồn ở trang Kho (phiếu nhập / điều chỉnh)" : undefined}
+        className={`h-8 rounded text-[12.5px] ${stockLocked ? "bg-muted text-muted-foreground" : ""}`}
       />
     </div>
   );

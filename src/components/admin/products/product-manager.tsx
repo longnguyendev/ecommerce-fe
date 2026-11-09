@@ -13,7 +13,6 @@ import {
   textareaClass,
 } from "@/components/admin/form-controls";
 import { Pagination, SearchInput } from "@/components/admin/list-controls";
-import { ProductImagesSection } from "@/components/admin/products/product-images-section";
 import {
   ProductVariantSection,
   type DraftResult,
@@ -32,6 +31,7 @@ import {
   type ProductStatus,
 } from "@/lib/admin/client";
 import { slugify } from "@/lib/slugify";
+import { toast } from "@/lib/toast";
 
 const PAGE_SIZE = 20;
 
@@ -62,9 +62,6 @@ export function ProductManager() {
 
   // Dữ liệu ảnh/biến thể nhập khi tạo sản phẩm mới (lưu cùng lúc với sản phẩm).
   const [formKey, setFormKey] = useState(0);
-  // Đồng bộ giữa mục ảnh (gán màu) và mục biến thể (hiện ảnh theo màu).
-  const [variantsVersion, setVariantsVersion] = useState(0);
-  const [imagesVersion, setImagesVersion] = useState(0);
   const draftImages = useRef<string[]>([]);
   const draftVariants = useRef<DraftResult | null>(null);
   const onDraftImages = useCallback((urls: string[]) => {
@@ -248,8 +245,11 @@ export function ProductManager() {
       }
 
       await loadProducts();
+      toast.success(editingId ? "Đã lưu sản phẩm" : "Đã tạo sản phẩm");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Lưu sản phẩm thất bại");
+      const message = err instanceof Error ? err.message : "Lưu sản phẩm thất bại";
+      setError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -270,8 +270,11 @@ export function ProductManager() {
         id: p.id,
       });
       await loadProducts();
+      toast.success("Đã xoá sản phẩm");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Xoá sản phẩm thất bại");
+      const message = err instanceof Error ? err.message : "Xoá sản phẩm thất bại";
+      setError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -383,20 +386,12 @@ export function ProductManager() {
             </Field>
           </FormCard>
 
-          <ProductImagesSection
-            key={`img-${editingId ?? `new-${formKey}`}`}
-            productId={editingId}
-            onDraftChange={onDraftImages}
-            reloadToken={variantsVersion}
-            onChange={() => setImagesVersion((v) => v + 1)}
-          />
           <ProductVariantSection
             key={`var-${editingId ?? `new-${formKey}`}`}
             productId={editingId}
             skuPrefix={slug || slugify(name)}
             onDraftChange={onDraftVariants}
-            imagesToken={imagesVersion}
-            onSaved={() => setVariantsVersion((v) => v + 1)}
+            onDraftImages={onDraftImages}
           />
         </div>
       ) : null}
@@ -406,6 +401,7 @@ export function ProductManager() {
           { label: "Sản phẩm" },
           { label: "Danh mục" },
           { label: "Giá" },
+          { label: "Biến thể" },
           { label: "Trạng thái" },
           { label: "Thao tác", right: true },
         ]}
@@ -429,6 +425,9 @@ export function ProductManager() {
             <td className="px-4 py-3 text-muted-foreground">{p.category.name}</td>
             <td className="px-4 py-3">
               {p.variants[0] ? `${p.variants[0].price.toLocaleString("vi-VN")} ₫` : "—"}
+            </td>
+            <td className="px-4 py-3 text-muted-foreground">
+              {p.variants.length > 0 ? `${p.variants.length} biến thể` : "Chưa có"}
             </td>
             <td className="px-4 py-3">
               <Badge

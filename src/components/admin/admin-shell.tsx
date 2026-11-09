@@ -1,4 +1,5 @@
 import { AdminHeader } from "@/components/admin/admin-header";
+import { Toaster } from "@/components/shared/toaster";
 
 export function ErrorBanner({ message }: { message: string | null }) {
   if (!message) return null;
@@ -41,6 +42,7 @@ export function AdminShell({
         <ErrorBanner message={error ?? null} />
         {children}
       </main>
+      <Toaster />
     </div>
   );
 }

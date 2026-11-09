@@ -64,19 +64,24 @@ export function CategoryManager() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const input = { name, slug: slug || slugify(name) };
-    const ok = await run(async () => {
-      if (editingId) {
-        await gql(
-          `mutation UpdateCategory($input: UpdateCategoryInput!) { updateCategory(input: $input) { id } }`,
-          { input: { id: editingId, ...input } },
-        );
-      } else {
-        await gql(
-          `mutation CreateCategory($input: CreateCategoryInput!) { createCategory(input: $input) { id } }`,
-          { input },
-        );
-      }
-    }, "Lưu danh mục thất bại");
+    const ok = await run(
+      async () => {
+        if (editingId) {
+          await gql(
+            `mutation UpdateCategory($input: UpdateCategoryInput!) { updateCategory(input: $input) { id } }`,
+            { input: { id: editingId, ...input } },
+          );
+        } else {
+          await gql(
+            `mutation CreateCategory($input: CreateCategoryInput!) { createCategory(input: $input) { id } }`,
+            { input },
+          );
+        }
+      },
+      "Lưu danh mục thất bại",
+      true,
+      editingId ? "Đã lưu danh mục" : "Đã tạo danh mục",
+    );
     if (ok) reset();
   }
 
@@ -106,18 +111,25 @@ export function CategoryManager() {
     )
       return;
     try {
-      await run(async () => {
-        try {
-          await gql(`mutation DeleteCategory($id: ID!) { deleteCategory(id: $id) }`, { id: c.id });
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : "";
-          throw new Error(
-            msg.includes("conflict")
-              ? `Không thể xoá "${c.name}": danh mục còn danh mục con hoặc còn sản phẩm.`
-              : msg || "Xoá danh mục thất bại",
-          );
-        }
-      }, "Xoá danh mục thất bại");
+      await run(
+        async () => {
+          try {
+            await gql(`mutation DeleteCategory($id: ID!) { deleteCategory(id: $id) }`, {
+              id: c.id,
+            });
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : "";
+            throw new Error(
+              msg.includes("conflict")
+                ? `Không thể xoá "${c.name}": danh mục còn danh mục con hoặc còn sản phẩm.`
+                : msg || "Xoá danh mục thất bại",
+            );
+          }
+        },
+        "Xoá danh mục thất bại",
+        true,
+        "Đã xoá danh mục",
+      );
     } catch {
       /* run đã xử lý lỗi */
     }

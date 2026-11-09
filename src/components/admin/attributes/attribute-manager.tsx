@@ -63,39 +63,54 @@ export function AttributeManager() {
       .split(",")
       .map((v) => v.trim())
       .filter(Boolean);
-    const ok = await run(async () => {
-      if (editingId) {
-        await gql(
-          `mutation UpdateAttribute($input: UpdateAttributeInput!) { updateAttribute(input: $input) { id } }`,
-          { input: { id: editingId, name, values: valueList } },
-        );
-      } else {
-        await gql(
-          `mutation CreateAttribute($input: CreateAttributeInput!) { createAttribute(input: $input) { id } }`,
-          { input: { name, values: valueList } },
-        );
-      }
-    }, "Lưu thuộc tính thất bại");
+    const ok = await run(
+      async () => {
+        if (editingId) {
+          await gql(
+            `mutation UpdateAttribute($input: UpdateAttributeInput!) { updateAttribute(input: $input) { id } }`,
+            { input: { id: editingId, name, values: valueList } },
+          );
+        } else {
+          await gql(
+            `mutation CreateAttribute($input: CreateAttributeInput!) { createAttribute(input: $input) { id } }`,
+            { input: { name, values: valueList } },
+          );
+        }
+      },
+      "Lưu thuộc tính thất bại",
+      true,
+      editingId ? "Đã lưu thuộc tính" : "Đã tạo thuộc tính",
+    );
     if (ok) reset();
   }
 
   async function addValue(attr: Attribute) {
     const value = (newValueByAttr[attr.id] ?? "").trim();
     if (!value) return;
-    const ok = await run(async () => {
-      await gql(
-        `mutation AddValue($input: CreateAttributeValueInput!) { addAttributeValue(input: $input) { id } }`,
-        { input: { attributeId: attr.id, value } },
-      );
-    }, "Thêm giá trị thất bại");
+    const ok = await run(
+      async () => {
+        await gql(
+          `mutation AddValue($input: CreateAttributeValueInput!) { addAttributeValue(input: $input) { id } }`,
+          { input: { attributeId: attr.id, value } },
+        );
+      },
+      "Thêm giá trị thất bại",
+      true,
+      "Đã thêm giá trị",
+    );
     if (ok) setNewValueByAttr((prev) => ({ ...prev, [attr.id]: "" }));
   }
 
   async function deleteValue(v: AttributeValue) {
     if (!(await confirm({ title: `Xoá giá trị "${v.value}"?` }))) return;
-    await run(async () => {
-      await gql(`mutation DeleteValue($id: ID!) { deleteAttributeValue(id: $id) }`, { id: v.id });
-    }, "Xoá giá trị thất bại");
+    await run(
+      async () => {
+        await gql(`mutation DeleteValue($id: ID!) { deleteAttributeValue(id: $id) }`, { id: v.id });
+      },
+      "Xoá giá trị thất bại",
+      true,
+      "Đã xoá giá trị",
+    );
   }
 
   async function deleteAttr(a: Attribute) {
@@ -106,11 +121,16 @@ export function AttributeManager() {
       }))
     )
       return;
-    await run(async () => {
-      await gql(`mutation DeleteAttr($id: ID!) { deleteAttribute(id: $id) }`, {
-        id: a.id,
-      });
-    }, "Xoá thuộc tính thất bại");
+    await run(
+      async () => {
+        await gql(`mutation DeleteAttr($id: ID!) { deleteAttribute(id: $id) }`, {
+          id: a.id,
+        });
+      },
+      "Xoá thuộc tính thất bại",
+      true,
+      "Đã xoá thuộc tính",
+    );
   }
 
   return (

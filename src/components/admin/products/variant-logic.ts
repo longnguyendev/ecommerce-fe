@@ -29,6 +29,8 @@ export interface RowData {
   sku: string;
   price: string;
   stock: string;
+  /** Biến thể đã có: tồn chỉ đổi ở trang Kho (qua phiếu nhập / điều chỉnh). */
+  stockLocked?: boolean;
 }
 export interface Combo {
   key: string;
@@ -46,7 +48,8 @@ export const DEFAULT_KEY = "__default__";
 export interface DraftVariant {
   sku: string;
   price: number;
-  stockQuantity: number;
+  /** Bỏ trống = không đụng tới tồn (biến thể đã có). */
+  stockQuantity?: number;
   isActive: boolean;
   options: { attributeId: string; value: string }[];
 }

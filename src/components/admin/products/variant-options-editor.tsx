@@ -21,10 +21,10 @@ export function VariantOptionsEditor({
   suggestionsFor: (opt: Option) => string[];
   onOpenIndex: (updater: (cur: number | null) => number | null) => void;
   onPatchOption: (index: number, patch: Partial<Option>) => void;
-  onRemoveOption: (index: number) => void;
+  onRemoveOption: (index: number) => void | Promise<void>;
   onAddOption: () => void;
   onAddValue: (index: number, value: string) => void;
-  onRemoveValue: (index: number, value: string) => void;
+  onRemoveValue: (index: number, value: string) => void | Promise<void>;
 }) {
   const usedAttributeIds = options.map((o) => o.attributeId);
   return (
