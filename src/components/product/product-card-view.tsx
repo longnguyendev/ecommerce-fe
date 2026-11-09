@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 import { ProductImageCarousel } from "@/components/product/product-image-carousel";
+import { WishlistButton } from "@/components/wishlist/wishlist-button";
 
 const MAX_SWATCHES = 5;
 
@@ -70,21 +71,7 @@ export function ProductCardView({
           <Link href={href} className="min-w-0 flex-1">
             <h2 className="line-clamp-1 text-[13px] font-normal text-foreground">{displayName}</h2>
           </Link>
-          <span
-            className="shrink-0 text-[#9ca3af] transition-colors hover:text-foreground"
-            aria-hidden="true"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.4"
-            >
-              <path d="M17.6 3.3c1.1.1 1.9 1.1 1.9 2.2V21L12 17.2 4.5 21V5.5c0-1.1.8-2 1.9-2.2a48.5 48.5 0 0 1 11.2 0Z" />
-            </svg>
-          </span>
+          <WishlistButton slug={slug} name={name} className="-m-1.5 shrink-0 p-1.5" />
         </div>
 
         <div className="mt-0.5 flex items-center gap-1.5">

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
 import { errorMessage, LAST_ORDER_KEY, lookupOrder, type PublicOrder } from "@/lib/storefront/cart";
 
-import { OrderSummary } from "./order-summary";
+import { ORDER_STATUS_TEXT, OrderSummary } from "./order-summary";
 
 function readLastOrder(code: string | undefined): PublicOrder | null {
   if (!code) return null;
@@ -30,15 +30,45 @@ export function OrderLookupView({ initialCode }: { initialCode?: string }) {
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+
+  // Tải lại trạng thái mới nhất bằng SĐT của chính đơn (BE khớp contactPhone/shippingPhone).
+  const refresh = useCallback(async (current: PublicOrder, silent = false) => {
+    if (!silent) setRefreshing(true);
+    setRefreshError(null);
+    try {
+      const fresh = await lookupOrder(current.orderCode, current.contactPhone);
+      setOrder(fresh);
+      setUpdatedAt(new Date());
+    } catch (err) {
+      if (!silent) setRefreshError(errorMessage(err));
+    } finally {
+      if (!silent) setRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
     const last = readLastOrder(initialCode);
     if (last) {
       setOrder(last);
       setJustPlaced(true);
+      // Đơn trong sessionStorage có thể đã cũ (shop đã xác nhận/giao): cập nhật ngầm.
+      void refresh(last, true);
     }
     setChecked(true);
-  }, [initialCode]);
+  }, [initialCode, refresh]);
+
+  const lookupAnother = () => {
+    setOrder(null);
+    setJustPlaced(false);
+    setCode("");
+    setPhone("");
+    setError(null);
+    setRefreshError(null);
+    setUpdatedAt(null);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +80,7 @@ export function OrderLookupView({ initialCode }: { initialCode?: string }) {
     setError(null);
     try {
       setOrder(await lookupOrder(code.trim(), phone.trim()));
+      setUpdatedAt(new Date());
       setJustPlaced(false);
     } catch (err) {
       setError(errorMessage(err));
@@ -78,11 +109,43 @@ export function OrderLookupView({ initialCode }: { initialCode?: string }) {
             </p>
           </div>
         ) : (
-          <h1 className="mb-8 text-[clamp(22px,2.4vw,30px)] font-medium tracking-[-0.02em]">
-            Đơn hàng {order.orderCode}
-          </h1>
+          <div className="mb-8">
+            <h1 className="text-[clamp(22px,2.4vw,30px)] font-medium tracking-[-0.02em]">
+              Đơn hàng {order.orderCode}
+            </h1>
+            <p className="mt-2 text-[12.5px] text-muted-foreground">
+              Đặt lúc {new Date(order.createdAt).toLocaleString("vi-VN")} · Trạng thái:{" "}
+              <span className="text-foreground">{ORDER_STATUS_TEXT[order.status]}</span>
+            </p>
+          </div>
         )}
         <OrderSummary order={order} />
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-[12px] text-muted-foreground">
+          <p aria-live="polite">
+            {refreshError ? (
+              <span className="text-destructive">{refreshError}</span>
+            ) : updatedAt ? (
+              <>Cập nhật lúc {updatedAt.toLocaleTimeString("vi-VN")}</>
+            ) : null}
+          </p>
+          <div className="flex items-center gap-5">
+            <button
+              type="button"
+              onClick={() => void refresh(order)}
+              disabled={refreshing}
+              className="underline underline-offset-4 hover:text-foreground disabled:opacity-50"
+            >
+              {refreshing ? "Đang cập nhật…" : "Cập nhật trạng thái"}
+            </button>
+            <button
+              type="button"
+              onClick={lookupAnother}
+              className="underline underline-offset-4 hover:text-foreground"
+            >
+              Tra cứu đơn khác
+            </button>
+          </div>
+        </div>
         <div className="mt-10 flex justify-center">
           <Link
             href="/products"

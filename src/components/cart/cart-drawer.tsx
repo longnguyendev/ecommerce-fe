@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { CountBadge, HEADER_ICON_CLASS } from "@/components/layout/header-icon";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 import { CartLineItem, CartTotals, FreeShippingProgress } from "./cart-parts";
@@ -37,11 +38,12 @@ export function CartDrawer() {
   return (
     <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
       <SheetTrigger
-        className="flex items-center gap-1 text-inherit"
+        className={`${HEADER_ICON_CLASS} -mr-2`}
         aria-label={`Mở giỏ hàng, ${count} sản phẩm`}
+        title="Giỏ hàng"
       >
         <BagIcon />
-        <span className="text-[10.5px] tabular-nums">{ready ? count : ""}</span>
+        <CountBadge count={ready ? count : 0} />
       </SheetTrigger>
       <SheetContent side="right" className="flex flex-col sm:max-w-md">
         <SheetHeader className="border-b border-border px-5 py-4">

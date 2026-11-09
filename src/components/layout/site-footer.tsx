@@ -18,6 +18,7 @@ const COLUMNS = [
   {
     title: "Hỗ trợ",
     links: [
+      { label: "Tra cứu đơn hàng", href: "/order/lookup" },
       { label: "Câu hỏi thường gặp", href: "/faq" },
       { label: "Vận chuyển", href: "/shipping" },
       { label: "Đổi trả", href: "/returns" },

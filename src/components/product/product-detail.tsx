@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { useCart } from "@/components/cart/cart-provider";
 import { Button } from "@/components/ui/button";
+import { WishlistButton } from "@/components/wishlist/wishlist-button";
 import { formatPrice, type Product } from "@/lib/catalog";
 import { isLocalImage } from "@/lib/image-url";
 import { colorHex, type StoreVariant } from "@/lib/storefront/api";
@@ -237,16 +238,22 @@ export function ProductDetail({
           </p>
         ) : null}
 
-        <div className="mt-6">
+        <div className="mt-6 flex gap-2">
           <Button
             type="button"
             onClick={() => void add()}
             disabled={adding || soldOut}
             aria-busy={adding}
-            className="h-12 w-full rounded-none px-10 text-xs font-normal uppercase tracking-[0.15em]"
+            className="h-12 flex-1 rounded-none px-10 text-xs font-normal uppercase tracking-[0.15em]"
           >
             {soldOut ? "Hết hàng" : adding ? "Đang thêm…" : "Thêm vào giỏ hàng"}
           </Button>
+          <WishlistButton
+            slug={product.slug}
+            name={product.name}
+            size={20}
+            className="h-12 w-12 shrink-0 border border-border hover:border-foreground"
+          />
         </div>
 
         <div className="mt-8">
