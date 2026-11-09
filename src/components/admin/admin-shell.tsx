@@ -1,4 +1,5 @@
 import { AdminHeader } from "@/components/admin/admin-header";
+import { OrderAlertsListener } from "@/components/admin/order-alerts";
 import { Toaster } from "@/components/shared/toaster";
 
 export function ErrorBanner({ message }: { message: string | null }) {
@@ -43,6 +44,7 @@ export function AdminShell({
         {children}
       </main>
       <Toaster />
+      <OrderAlertsListener />
     </div>
   );
 }

@@ -31,6 +31,18 @@ export function clearToken(): void {
   clearTokens();
 }
 
+/** Số giây còn lại của access token (đọc `exp` trong JWT); null nếu không đọc được. */
+export function accessTokenTtl(token: string | null = getToken()): number | null {
+  if (!token) return null;
+  try {
+    const part = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    const { exp } = JSON.parse(atob(part)) as { exp?: number };
+    return typeof exp === "number" ? exp - Date.now() / 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
 export function isAuthenticated(): boolean {
   return Boolean(getToken());
 }
@@ -72,7 +84,7 @@ async function post<T>(
 
 let refreshing: Promise<boolean> | null = null;
 
-async function refreshAccessToken(): Promise<boolean> {
+export async function refreshAccessToken(): Promise<boolean> {
   if (typeof window === "undefined") return false;
   const refreshToken = getRefreshToken();
   if (!refreshToken) return false;
