@@ -3,10 +3,14 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
+import { NotificationBell } from "@/components/admin/notification-bell";
+import { OrderAlertsControls } from "@/components/admin/order-alerts";
 import { Button } from "@/components/ui/button";
 import { clearToken } from "@/lib/admin/client";
+import { stopOrderAlerts } from "@/lib/admin/order-alerts";
 
 const NAV = [
+  { href: "/admin/orders", label: "Đơn hàng" },
   { href: "/admin/products", label: "Sản phẩm" },
   { href: "/admin/inventory", label: "Kho" },
   { href: "/admin/categories", label: "Danh mục" },
@@ -19,6 +23,7 @@ export function AdminHeader() {
   const pathname = usePathname();
 
   function logout() {
+    stopOrderAlerts();
     clearToken();
     router.replace("/admin/login");
   }
@@ -30,7 +35,7 @@ export function AdminHeader() {
           <span className="text-xl font-medium tracking-[0.14em]">OXI</span>
           <nav className="flex items-center gap-1">
             {NAV.map((n) => {
-              const active = pathname === n.href;
+              const active = pathname === n.href || pathname.startsWith(`${n.href}/`);
               return (
                 <Link
                   key={n.href}
@@ -48,6 +53,8 @@ export function AdminHeader() {
           </nav>
         </div>
         <div className="flex items-center gap-3">
+          <OrderAlertsControls />
+          <NotificationBell />
           <Button
             variant="outline"
             onClick={() => router.push("/")}

@@ -4,18 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { CartDrawer } from "@/components/cart/cart-drawer";
 
 import { Announcement } from "./announcement";
 
-function Icon({
-  name,
-  size = 20,
-}: {
-  name: "search" | "user" | "bag" | "heart" | "menu";
-  size?: number;
-}) {
+function Icon({ name, size = 20 }: { name: "search" | "user" | "heart" | "menu"; size?: number }) {
   const p = {
     width: size,
     height: size,
@@ -38,13 +31,6 @@ function Icon({
       <svg {...p} aria-hidden="true">
         <circle cx="12" cy="8" r="4" />
         <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
-      </svg>
-    );
-  if (name === "bag")
-    return (
-      <svg {...p} aria-hidden="true">
-        <path d="M6 8h12l-1 12H7L6 8Z" />
-        <path d="M9 8V6a3 3 0 0 1 6 0v2" />
       </svg>
     );
   if (name === "heart")
@@ -131,44 +117,7 @@ export function SiteHeader() {
               <Icon name="user" size={18} />
             </span>
 
-            <Sheet>
-              <SheetTrigger
-                className="flex items-center gap-1 text-foreground"
-                aria-label="Mở giỏ hàng"
-              >
-                <Icon name="bag" size={18} />
-                <span className="text-[10.5px] tabular-nums">0</span>
-              </SheetTrigger>
-              <SheetContent side="right" className="sm:max-w-md">
-                <SheetHeader className="border-b border-border px-5 py-4">
-                  <div className="flex items-center justify-between">
-                    <SheetTitle className="text-xs font-normal uppercase tracking-[0.08em] text-foreground">
-                      Giỏ hàng (0)
-                    </SheetTitle>
-                  </div>
-                </SheetHeader>
-                <div className="flex flex-1 flex-col items-center justify-center px-5 py-8 text-center">
-                  <svg
-                    className="mb-4 text-[#999]"
-                    width="40"
-                    height="40"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                  >
-                    <path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                  </svg>
-                  <p className="mb-4 text-xs text-foreground">Giỏ hàng trống</p>
-                  <Button
-                    variant="outline"
-                    className="h-10 rounded-none border-foreground px-6 text-xs"
-                  >
-                    Tiếp tục mua sắm
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
+            <CartDrawer />
           </div>
         </div>
       </header>

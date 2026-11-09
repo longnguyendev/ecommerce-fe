@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { useCart } from "@/components/cart/cart-provider";
 import { Button } from "@/components/ui/button";
 import { formatPrice, type Product } from "@/lib/catalog";
 import { isLocalImage } from "@/lib/image-url";
@@ -44,7 +45,7 @@ export function ProductDetail({
   const [color, setColor] = useState<string | null>(
     initialColor ?? variants.find((v) => v.color)?.color ?? null,
   );
-  const [added, setAdded] = useState(false);
+  const { addItem, pending, setDrawerOpen } = useCart();
   const [error, setError] = useState(false);
 
   const sizes = useMemo(
@@ -93,14 +94,16 @@ export function ProductDetail({
     ? colorNames.map((name) => ({ name, hex: colorHex(name) ?? "#cccccc" }))
     : product.colors.map((c, i) => ({ name: `Màu ${i + 1}`, hex: c }));
 
-  const add = () => {
-    if ((hasSize && !size) || (hasColor && !color)) {
+  const adding = selectedVariant ? pending.has(selectedVariant.id) : false;
+  const soldOut = selectedVariant !== undefined && selectedVariant.stockQuantity <= 0;
+
+  const add = async () => {
+    if ((hasSize && !size) || (hasColor && !color) || !selectedVariant) {
       setError(true);
       return;
     }
     setError(false);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1800);
+    if (await addItem(selectedVariant.id, 1)) setDrawerOpen(true);
   };
 
   return (
@@ -237,10 +240,12 @@ export function ProductDetail({
         <div className="mt-6">
           <Button
             type="button"
-            onClick={add}
+            onClick={() => void add()}
+            disabled={adding || soldOut}
+            aria-busy={adding}
             className="h-12 w-full rounded-none px-10 text-xs font-normal uppercase tracking-[0.15em]"
           >
-            {added ? "Đã thêm vào giỏ" : "Thêm vào giỏ hàng"}
+            {soldOut ? "Hết hàng" : adding ? "Đang thêm…" : "Thêm vào giỏ hàng"}
           </Button>
         </div>
 
