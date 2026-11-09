@@ -70,7 +70,10 @@ export function ProductCardView({
           <Link href={href} className="min-w-0 flex-1">
             <h2 className="line-clamp-1 text-[13px] font-normal text-foreground">{displayName}</h2>
           </Link>
-          <span className="shrink-0 text-muted-foreground" aria-hidden="true">
+          <span
+            className="shrink-0 text-[#9ca3af] transition-colors hover:text-foreground"
+            aria-hidden="true"
+          >
             <svg
               width="16"
               height="16"
@@ -104,10 +107,8 @@ export function ProductCardView({
                   setSelected(i);
                   setTouched(true);
                 }}
-                className={`h-3.5 w-3.5 rounded-full border border-border transition-shadow ${
-                  i === selected
-                    ? "ring-1 ring-foreground ring-offset-2 ring-offset-background"
-                    : "hover:ring-1 hover:ring-border hover:ring-offset-2 hover:ring-offset-background"
+                className={`h-3 w-3 rounded-full border transition-all duration-150 ${
+                  i === selected ? "scale-125 border-foreground" : "border-border"
                 }`}
                 style={{ backgroundColor: c.hex }}
               />

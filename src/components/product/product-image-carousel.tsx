@@ -36,7 +36,7 @@ export function ProductImageCarousel({
     "opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 pointer-coarse:opacity-100";
 
   return (
-    <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+    <div className="relative aspect-[3/4] overflow-hidden bg-muted">
       <Link href={href} className="absolute inset-0 block" aria-label={name}>
         <div
           className="flex h-full w-full transition-transform duration-500 ease-out"

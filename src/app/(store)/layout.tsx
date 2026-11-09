@@ -8,6 +8,9 @@ export default function StoreLayout({
 }>) {
   return (
     <>
+      <noscript>
+        <style>{"[data-reveal]{opacity:1!important;transform:none!important}"}</style>
+      </noscript>
       <SiteHeader />
       <main>{children}</main>
       <SiteFooter />

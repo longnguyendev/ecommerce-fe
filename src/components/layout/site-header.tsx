@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -59,57 +61,73 @@ function Icon({
 }
 
 export function SiteHeader() {
+  // Trang chủ: header trong suốt đè lên hero (chữ trắng), cuộn qua ~50px thì
+  // đổi sang nền trắng/chữ đen, transition-all 0.3s như bản gốc.
+  const isHome = usePathname() === "/";
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const overlay = isHome && !scrolled;
+  const headerClass = isHome
+    ? overlay
+      ? "absolute inset-x-0 top-9 z-40 border-b border-transparent bg-transparent text-white"
+      : "fixed inset-x-0 top-0 z-40 border-b border-border bg-white/95 text-foreground backdrop-blur-sm"
+    : "sticky top-0 z-40 border-b border-border bg-background/95 text-foreground backdrop-blur-sm";
+
   return (
     <>
       <Announcement />
 
-      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
+      <header className={`transition-all duration-300 ${headerClass}`}>
         <div className="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4">
           <nav className="flex items-center gap-6">
             <Link
               href="/products"
-              className="hidden text-[13px] text-foreground transition-colors hover:text-muted-foreground sm:block"
+              className="hidden text-[13px] text-inherit transition-colors hover:opacity-70 sm:block"
             >
               Cửa hàng
             </Link>
             <Link
               href="/products"
-              className="hidden text-[13px] text-foreground transition-colors hover:text-muted-foreground md:block"
+              className="hidden text-[13px] text-inherit transition-colors hover:opacity-70 md:block"
             >
               Tất cả sản phẩm
             </Link>
-            <span className="text-foreground sm:hidden" aria-hidden="true">
+            <span className="text-inherit sm:hidden" aria-hidden="true">
               <Icon name="menu" />
             </span>
           </nav>
 
           <Link
             href="/"
-            className="justify-self-center text-[24px] font-medium tracking-[0.14em] text-foreground"
+            className="justify-self-center text-[24px] font-medium tracking-[0.14em] text-inherit"
             aria-label="OXI Apparel"
           >
             OXI
           </Link>
 
-          <div className="flex items-center justify-end gap-3.5 text-foreground">
+          <div className="flex items-center justify-end gap-3.5 text-inherit">
             <label className="hidden items-center gap-2 border-b border-border pb-1 lg:flex">
               <input
                 type="search"
                 placeholder="Tìm kiếm"
                 aria-label="Tìm kiếm"
-                className="w-[92px] bg-transparent text-[12.5px] text-foreground outline-none placeholder:text-muted-foreground"
+                className="w-[92px] bg-transparent text-[12.5px] text-inherit outline-none placeholder:text-inherit opacity-60"
               />
-              <span className="text-muted-foreground" aria-hidden="true">
+              <span className="text-inherit opacity-60" aria-hidden="true">
                 <Icon name="search" size={16} />
               </span>
             </label>
 
-            <span className="hidden text-[11.5px] tracking-wide text-foreground lg:block">EN</span>
-            <span className="hidden text-[13px] text-foreground lg:block">Về chúng tôi</span>
-            <span className="hidden text-foreground sm:block" aria-hidden="true">
+            <span className="hidden text-[13px] text-inherit lg:block">Về chúng tôi</span>
+            <span className="hidden text-inherit sm:block" aria-hidden="true">
               <Icon name="heart" size={18} />
             </span>
-            <span className="hidden text-foreground sm:block" aria-hidden="true">
+            <span className="hidden text-inherit sm:block" aria-hidden="true">
               <Icon name="user" size={18} />
             </span>
 

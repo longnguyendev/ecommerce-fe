@@ -7,7 +7,7 @@ import { HERO } from "@/data/home";
 export function Hero() {
   return (
     <section className="relative bg-foreground">
-      <div className="relative aspect-[2/3] sm:aspect-auto sm:h-[calc(100vh-64px)]">
+      <div className="relative aspect-[2/3] sm:aspect-auto sm:h-[calc(100vh-100px)] min-h-[400px] sm:min-h-[500px]">
         {/* mobile portrait */}
         <Image
           src={HERO.imageMobile}
@@ -36,7 +36,7 @@ export function Hero() {
                 render={<Link href={HERO.ctas[0].href} />}
                 nativeButton={false}
                 variant="default"
-                className="h-12 rounded-none bg-background px-10 text-xs font-normal uppercase tracking-[0.15em] text-foreground hover:bg-background/90"
+                className="h-12 rounded-none bg-background px-10 text-xs font-normal uppercase tracking-[0.15em] text-foreground transition-colors hover:bg-foreground hover:text-background"
               >
                 {HERO.ctas[0].label}
               </Button>

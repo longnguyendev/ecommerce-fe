@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { Reveal } from "@/components/shared/reveal";
 import {
   colorName,
   colorNamesOf,
@@ -230,8 +231,10 @@ export function Catalog({ products }: { products: Product[] }) {
         ) : null}
 
         <div className="grid grid-cols-2 gap-x-2.5 gap-y-8 sm:gap-x-4 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((p) => (
-            <ProductCard key={p.slug} product={p} />
+          {filtered.map((p, i) => (
+            <Reveal key={p.slug} index={i}>
+              <ProductCard product={p} />
+            </Reveal>
           ))}
         </div>
 
