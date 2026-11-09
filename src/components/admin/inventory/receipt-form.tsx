@@ -179,7 +179,7 @@ export function ReceiptForm({
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-left text-[13px]">
           <thead>
-            <tr className="border-b border-border text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+            <tr className="border-b border-border text-[11px] uppercase tracking-widest text-muted-foreground">
               <th className="py-2 pr-3 font-normal">Biến thể</th>
               <th className="w-28 px-2 py-2 font-normal">Số lượng</th>
               <th className="w-36 px-2 py-2 font-normal">Giá nhập (₫)</th>

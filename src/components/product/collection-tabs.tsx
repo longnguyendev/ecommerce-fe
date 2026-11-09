@@ -26,7 +26,7 @@ export function CollectionTabs({ tabs, active }: { tabs: CollectionTab[]; active
                 className="group block w-[104px] shrink-0 sm:w-[clamp(96px,11vw,160px)]"
               >
                 <div
-                  className={`relative aspect-[4/5] overflow-hidden bg-muted ${
+                  className={`relative aspect-4/5 overflow-hidden bg-muted ${
                     on ? "outline outline-1 outline-offset-2 outline-foreground" : ""
                   }`}
                 >

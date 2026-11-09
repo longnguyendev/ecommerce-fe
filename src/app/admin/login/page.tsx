@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+            <label className="mb-1.5 block text-[11px] uppercase tracking-widest text-muted-foreground">
               Email
             </label>
             <Input
@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+            <label className="mb-1.5 block text-[11px] uppercase tracking-widest text-muted-foreground">
               Mật khẩu
             </label>
             <Input

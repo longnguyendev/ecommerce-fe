@@ -57,7 +57,7 @@ export function useConfirm() {
           autoFocus
           variant={options?.destructive === false ? "default" : "destructive"}
           onClick={() => close(true)}
-          className="h-10 rounded-none text-xs uppercase tracking-[0.1em]"
+          className="h-10 rounded-none text-xs uppercase tracking-widest"
         >
           {options?.confirmLabel ?? "Xoá"}
         </Button>

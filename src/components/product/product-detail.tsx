@@ -106,7 +106,7 @@ export function ProductDetail({
   return (
     <div className="grid gap-10 lg:grid-cols-[1.12fr_1fr] lg:gap-16">
       <div>
-        <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+        <div className="relative aspect-4/5 overflow-hidden bg-muted">
           <Image
             src={gallery[active] ?? gallery[0]}
             alt={displayName}
@@ -179,6 +179,12 @@ export function ProductDetail({
                   title={s.name}
                   onClick={() => {
                     setColor(hasColor ? s.name : null);
+                    if (hasColor) {
+                      // Đồng bộ ?color= lên URL (không điều hướng, không tải lại trang).
+                      const url = new URL(window.location.href);
+                      url.searchParams.set("color", s.name);
+                      window.history.replaceState(null, "", url);
+                    }
                     setSize(null);
                     setActive(0);
                     setError(false);

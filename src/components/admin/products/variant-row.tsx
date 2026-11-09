@@ -8,7 +8,6 @@ export function VariantRow({
   row: r,
   imageUrl,
   missingImage,
-  stockLocked = false,
   onPatch,
 }: {
   combo: Combo;
@@ -17,8 +16,6 @@ export function VariantRow({
   imageUrl: string | null;
   /** Biến thể có màu nhưng màu đó chưa có ảnh nào. */
   missingImage: boolean;
-  /** Biến thể đã có: tồn chỉ đọc (đổi ở trang Kho). */
-  stockLocked?: boolean;
   onPatch: (patch: Partial<RowData>) => void;
 }) {
   return (
@@ -74,16 +71,12 @@ export function VariantRow({
         placeholder="Giá (VND)"
         className="h-8 rounded text-[12.5px]"
       />
-      <Input
-        type="number"
-        min={0}
-        value={r.stock}
-        onChange={(e) => onPatch({ stock: e.target.value })}
-        placeholder="Tồn đầu kỳ"
-        readOnly={stockLocked}
-        title={stockLocked ? "Đổi tồn ở trang Kho (phiếu nhập / điều chỉnh)" : undefined}
-        className={`h-8 rounded text-[12.5px] ${stockLocked ? "bg-muted text-muted-foreground" : ""}`}
-      />
+      <div
+        title="Tồn thay đổi ở trang Kho (phiếu nhập / điều chỉnh)"
+        className="flex h-8 items-center rounded border border-border bg-muted px-2.5 text-[12.5px] text-muted-foreground"
+      >
+        Tồn: {Number(r.stock) || 0}
+      </div>
     </div>
   );
 }

@@ -30,23 +30,8 @@ import { toast } from "@/lib/toast";
 
 export type { DraftResult, DraftVariant };
 
-/**
- * - Có `productId`: sửa sản phẩm đã tồn tại, lưu qua nút "Lưu biến thể".
- * - Không có `productId`: đang tạo sản phẩm mới, dữ liệu được báo ra ngoài qua
- *   `onDraftChange` (callback KHÔNG được setState) và lưu cùng sản phẩm.
- */
-export function ProductVariantSection({
-  productId,
-  skuPrefix,
-  onDraftChange,
-  onDraftImages,
-}: {
-  productId?: string | null;
-  skuPrefix?: string;
-  onDraftChange?: (result: DraftResult) => void;
-  /** Chế độ tạo mới: báo danh sách URL ảnh ra form cha (callback KHÔNG được setState). */
-  onDraftImages?: (urls: string[]) => void;
-}) {
+/** Biến thể + hình ảnh của một sản phẩm đã tồn tại; lưu qua nút "Lưu biến thể". */
+export function ProductVariantSection({ productId }: { productId: string }) {
   // Đồng bộ giữa mục ảnh (gán màu) và bảng biến thể (hiện ảnh theo màu).
   const [variantsVersion, setVariantsVersion] = useState(0);
   const [imagesToken, setImagesToken] = useState(0);
@@ -55,7 +40,6 @@ export function ProductVariantSection({
   const [options, setOptions] = useState<Option[]>([]);
   const [rows, setRows] = useState<Record<string, RowData>>({});
   const [bulkPrice, setBulkPrice] = useState("");
-  const [bulkStock, setBulkStock] = useState("");
   const [confirm, confirmDialog] = useConfirm();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +55,6 @@ export function ProductVariantSection({
         `query { attributes(pagination: { take: 50 }) { nodes { id name values { id value } } } }`,
       );
       setAttributes(attrData.attributes.nodes);
-      if (!productId) return; // đang tạo mới: chưa có biến thể nào trong DB
 
       const varData = await gql<{ productVariants: { nodes: Variant[] } }>(
         `query Variants($pid: ID!) {
@@ -232,7 +215,6 @@ export function ProductVariantSection({
         next[c.key] = {
           ...cur,
           price: bulkPrice !== "" ? bulkPrice : cur.price,
-          stock: bulkStock !== "" && !rows[c.key]?.stockLocked ? bulkStock : cur.stock,
         };
       }
       return next;
@@ -252,12 +234,8 @@ export function ProductVariantSection({
     if (hasVariants && list.length === 0) {
       return { error: "Thêm ít nhất một giá trị cho thuộc tính." };
     }
-    // Tạo mới + không biến thể + chưa nhập giá -> tạo sản phẩm chưa có giá bán.
-    if (!productId && !hasVariants && resolveRow(rows, DEFAULT_COMBO).price === "") {
-      return { variants: [] };
-    }
 
-    const prefix = (productId ? productId.slice(0, 6) : skuPrefix || "SKU").toUpperCase();
+    const prefix = productId.slice(0, 6).toUpperCase();
 
     const variants: DraftVariant[] = [];
     for (const c of list) {
@@ -271,8 +249,7 @@ export function ProductVariantSection({
       variants.push({
         sku,
         price: Number(r.price),
-        // Biến thể đã có: không gửi tồn để không ghi đè số tồn mới từ đơn hàng/phiếu nhập.
-        stockQuantity: rows[c.key]?.stockLocked ? undefined : Number(r.stock) || 0,
+        // Không gửi tồn: tồn chỉ đổi qua phiếu nhập / điều chỉnh ở trang Kho.
         isActive: true,
         options: c.options,
       });
@@ -280,13 +257,7 @@ export function ProductVariantSection({
     return { variants };
   }
 
-  // Chế độ tạo mới: báo trạng thái hiện tại cho form cha mỗi lần render.
-  useEffect(() => {
-    if (!productId) onDraftChange?.(buildVariants());
-  });
-
   async function save() {
-    if (!productId) return;
     setError(null);
 
     const result = buildVariants();
@@ -357,7 +328,6 @@ export function ProductVariantSection({
 
       <ProductImagesSection
         productId={productId}
-        onDraftChange={onDraftImages}
         reloadToken={variantsVersion}
         onChange={() => setImagesToken((v) => v + 1)}
       />
@@ -377,14 +347,6 @@ export function ProductVariantSection({
                 placeholder="Giá cho tất cả"
                 className="h-8 w-36 rounded text-[12.5px]"
               />
-              <Input
-                type="number"
-                min={0}
-                value={bulkStock}
-                onChange={(e) => setBulkStock(e.target.value)}
-                placeholder="Tồn cho tất cả"
-                className="h-8 w-36 rounded text-[12.5px]"
-              />
               <Button type="button" variant="outline" size="sm" onClick={applyBulk} className="h-8">
                 Áp dụng
               </Button>
@@ -399,8 +361,7 @@ export function ProductVariantSection({
               combo={c}
               row={resolveRow(rows, c)}
               imageUrl={imageFor(c)}
-              missingImage={Boolean(productId) && colorValueId(c) !== null && !imageFor(c)}
-              stockLocked={Boolean(rows[c.key]?.stockLocked)}
+              missingImage={colorValueId(c) !== null && !imageFor(c)}
               onPatch={(patch) => patchRow(c, patch)}
             />
           ))}
@@ -414,15 +375,9 @@ export function ProductVariantSection({
             </Link>
           </span>
           <div className="flex items-center gap-3">
-            {productId ? (
-              <SaveButton busy={busy} onClick={save}>
-                Lưu biến thể
-              </SaveButton>
-            ) : (
-              <span className="text-[12px] text-muted-foreground">
-                Biến thể sẽ được lưu cùng sản phẩm.
-              </span>
-            )}
+            <SaveButton busy={busy} onClick={save}>
+              Lưu biến thể
+            </SaveButton>
           </div>
         </div>
       </div>

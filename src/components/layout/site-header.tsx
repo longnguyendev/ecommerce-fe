@@ -116,7 +116,7 @@ export function SiteHeader() {
                 type="search"
                 placeholder="Tìm kiếm"
                 aria-label="Tìm kiếm"
-                className="w-[92px] bg-transparent text-[12.5px] text-inherit outline-none placeholder:text-inherit opacity-60"
+                className="w-23 bg-transparent text-[12.5px] text-inherit outline-none placeholder:text-inherit opacity-60"
               />
               <span className="text-inherit opacity-60" aria-hidden="true">
                 <Icon name="search" size={16} />
@@ -139,7 +139,7 @@ export function SiteHeader() {
                 <Icon name="bag" size={18} />
                 <span className="text-[10.5px] tabular-nums">0</span>
               </SheetTrigger>
-              <SheetContent side="right" className="sm:max-w-[448px]">
+              <SheetContent side="right" className="sm:max-w-md">
                 <SheetHeader className="border-b border-border px-5 py-4">
                   <div className="flex items-center justify-between">
                     <SheetTitle className="text-xs font-normal uppercase tracking-[0.08em] text-foreground">

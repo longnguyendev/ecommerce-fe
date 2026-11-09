@@ -187,7 +187,7 @@ export interface AdminProduct {
   thumbnail: string | null;
   status: ProductStatus;
   category: { name: string };
-  variants: { price: number; sku: string }[];
+  variants: { price: number }[];
 }
 
 export interface AdminUser {

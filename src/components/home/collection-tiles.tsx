@@ -6,11 +6,11 @@ import { ACTIVITY_TILES } from "@/data/home";
 export function CollectionTiles() {
   return (
     <section className="pt-0 pb-4 lg:py-6 lg:px-8">
-      <div className="mx-auto max-w-[1440px]">
+      <div className="mx-auto max-w-360">
         <div className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3 lg:grid-cols-5">
           {ACTIVITY_TILES.map((t) => (
             <Link key={t.href} href={t.href} className="group relative block bg-background">
-              <div className="relative aspect-[3/4] overflow-hidden">
+              <div className="relative aspect-3/4 overflow-hidden">
                 <Image
                   src={t.image}
                   alt={t.label}

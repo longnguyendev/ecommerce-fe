@@ -41,7 +41,7 @@ export function InventoryManager() {
               setCreating(true);
               window.scrollTo({ top: 0 });
             }}
-            className="h-11 rounded-none text-xs uppercase tracking-[0.1em]"
+            className="h-11 rounded-none text-xs uppercase tracking-widest"
           >
             + Tạo phiếu nhập
           </Button>

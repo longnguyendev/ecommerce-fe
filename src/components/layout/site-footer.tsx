@@ -41,7 +41,7 @@ const PAYMENTS = ["Visa", "Mastercard", "JCB", "VietQR", "COD"];
 export function SiteFooter() {
   return (
     <footer className="mt-4 border-t border-border bg-[#f4f4f4]">
-      <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+      <div className="mx-auto max-w-360 px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
         <div className="mb-10">
           <Link href="/" className="text-2xl tracking-[0.2em] text-foreground">
             OXI
@@ -84,7 +84,7 @@ export function SiteFooter() {
               <Button
                 type="submit"
                 variant="outline"
-                className="mt-2 h-auto rounded-none border-foreground px-4 py-2.5 text-[10px] font-medium uppercase tracking-[0.1em] text-foreground hover:bg-foreground hover:text-background sm:mt-0 sm:shrink-0"
+                className="mt-2 h-auto rounded-none border-foreground px-4 py-2.5 text-[10px] font-medium uppercase tracking-widest text-foreground hover:bg-foreground hover:text-background sm:mt-0 sm:shrink-0"
               >
                 Đăng ký
               </Button>
@@ -93,13 +93,13 @@ export function SiteFooter() {
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-4 pb-4 text-[#767676] sm:justify-start">
-          <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.1em]">
+          <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-widest">
             <span>Giao đến:</span>
             <span className="font-medium text-foreground">Vietnam</span>
             <span className="ml-1 text-[#999]">(VND)</span>
           </span>
           <span className="text-[#d0d0d0]">|</span>
-          <div className="inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.1em]">
+          <div className="inline-flex items-center gap-1 text-[11px] uppercase tracking-widest">
             <span>Ngôn ngữ:</span>
             <button
               type="button"

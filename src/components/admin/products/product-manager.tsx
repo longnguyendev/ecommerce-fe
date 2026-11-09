@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { AdminShell } from "@/components/admin/admin-shell";
@@ -13,10 +14,6 @@ import {
   textareaClass,
 } from "@/components/admin/form-controls";
 import { Pagination, SearchInput } from "@/components/admin/list-controls";
-import {
-  ProductVariantSection,
-  type DraftResult,
-} from "@/components/admin/products/product-variant-section";
 import { useConfirm } from "@/components/shared/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,17 +57,6 @@ export function ProductManager() {
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<ProductStatus>("ACTIVE");
 
-  // Dữ liệu ảnh/biến thể nhập khi tạo sản phẩm mới (lưu cùng lúc với sản phẩm).
-  const [formKey, setFormKey] = useState(0);
-  const draftImages = useRef<string[]>([]);
-  const draftVariants = useRef<DraftResult | null>(null);
-  const onDraftImages = useCallback((urls: string[]) => {
-    draftImages.current = urls;
-  }, []);
-  const onDraftVariants = useCallback((r: DraftResult) => {
-    draftVariants.current = r;
-  }, []);
-
   const totalPages = useMemo(() => Math.max(1, Math.ceil(total / PAGE_SIZE)), [total]);
 
   const loadCategories = useCallback(async () => {
@@ -96,7 +82,7 @@ export function ProductManager() {
         `query Products($take: Int!, $skip: Int!, $filter: ProductFilterInput) {
           products(pagination: { take: $take, skip: $skip }, filter: $filter) {
             totalCount
-            nodes { id name slug thumbnail status category { name } variants { price sku } }
+            nodes { id name slug thumbnail status category { name } variants { price } }
           }
         }`,
         {
@@ -142,9 +128,6 @@ export function ProductManager() {
   }, [loadProducts]);
 
   function openCreate() {
-    setFormKey((k) => k + 1);
-    draftImages.current = [];
-    draftVariants.current = null;
     setEditingId(null);
     setName("");
     setSlug("");
@@ -201,47 +184,14 @@ export function ProductManager() {
           { input: { id: editingId, ...baseInput } },
         );
       } else {
-        const draft = draftVariants.current;
-        if (draft && "error" in draft) {
-          setError(draft.error);
-          return;
-        }
-
         const created = await gql<{ createProduct: { id: string } }>(
           `mutation CreateProduct($input: CreateProductInput!) { createProduct(input: $input) { id } }`,
           { input: baseInput },
         );
-        const newId = created.createProduct.id;
-
-        try {
-          // Ảnh: ảnh đầu tiên là ảnh đại diện.
-          const urls = draftImages.current;
-          for (const [i, url] of urls.entries()) {
-            await gql(
-              `mutation AddImage($input: CreateProductImageInput!) { createProductImage(input: $input) { id } }`,
-              {
-                input: {
-                  productId: newId,
-                  url,
-                  sortOrder: i,
-                  isPrimary: i === 0,
-                },
-              },
-            );
-          }
-          // Biến thể
-          if (draft && draft.variants.length > 0) {
-            await gql(
-              `mutation Sync($input: SyncProductVariantsInput!) { syncProductVariants(input: $input) { id } }`,
-              { input: { productId: newId, variants: draft.variants } },
-            );
-          }
-        } finally {
-          // Dù bước phụ lỗi, sản phẩm đã được tạo: chuyển sang chế độ sửa để người
-          // dùng thấy phần đã lưu và sửa tiếp.
-          setEditingId(newId);
-          setSlug(finalSlug);
-        }
+        toast.success("Đã tạo sản phẩm. Thêm hình ảnh và biến thể tại đây.");
+        // Hình ảnh + biến thể nhập ở trang riêng của sản phẩm vừa tạo.
+        router.push(`/admin/products/${created.createProduct.id}/variants`);
+        return;
       }
 
       await loadProducts();
@@ -289,7 +239,7 @@ export function ProductManager() {
       action={
         <Button
           onClick={openCreate}
-          className="h-11 rounded-none text-xs uppercase tracking-[0.1em]"
+          className="h-11 rounded-none text-xs uppercase tracking-widest"
         >
           + Thêm sản phẩm
         </Button>
@@ -311,6 +261,16 @@ export function ProductManager() {
             onSubmit={onSubmit}
             onCancel={() => setShowForm(false)}
           >
+            {editingId ? (
+              <p className="text-[12.5px] sm:col-span-2">
+                <Link
+                  href={`/admin/products/${editingId}/variants`}
+                  className="underline underline-offset-4"
+                >
+                  Quản lý biến thể & hình ảnh →
+                </Link>
+              </p>
+            ) : null}
             <Field label="Tên sản phẩm *">
               <Input
                 value={name}
@@ -385,14 +345,6 @@ export function ProductManager() {
               </select>
             </Field>
           </FormCard>
-
-          <ProductVariantSection
-            key={`var-${editingId ?? `new-${formKey}`}`}
-            productId={editingId}
-            skuPrefix={slug || slugify(name)}
-            onDraftChange={onDraftVariants}
-            onDraftImages={onDraftImages}
-          />
         </div>
       ) : null}
 
@@ -418,7 +370,9 @@ export function ProductManager() {
                 />
                 <div className="min-w-0">
                   <p className="truncate font-medium">{p.name}</p>
-                  <p className="truncate text-[11px] text-muted-foreground">/{p.slug}</p>
+                  <p title={p.id} className="truncate font-mono text-[11px] text-muted-foreground">
+                    {p.id.slice(0, 8)}
+                  </p>
                 </div>
               </div>
             </td>
@@ -427,7 +381,12 @@ export function ProductManager() {
               {p.variants[0] ? `${p.variants[0].price.toLocaleString("vi-VN")} ₫` : "—"}
             </td>
             <td className="px-4 py-3 text-muted-foreground">
-              {p.variants.length > 0 ? `${p.variants.length} biến thể` : "Chưa có"}
+              <Link
+                href={`/admin/products/${p.id}/variants`}
+                className="underline underline-offset-4 hover:text-foreground"
+              >
+                {p.variants.length > 0 ? `${p.variants.length} biến thể` : "Chưa có"}
+              </Link>
             </td>
             <td className="px-4 py-3">
               <Badge
@@ -438,11 +397,7 @@ export function ProductManager() {
               </Badge>
             </td>
             <td className="px-4 py-3 text-right">
-              <RowActions
-                editLabel="Sửa / Biến thể"
-                onEdit={() => openEdit(p)}
-                onDelete={() => onDelete(p)}
-              />
+              <RowActions editLabel="Sửa" onEdit={() => openEdit(p)} onDelete={() => onDelete(p)} />
             </td>
           </tr>
         ))}

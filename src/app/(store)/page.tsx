@@ -21,13 +21,13 @@ export default async function Home() {
       <CollectionTiles />
 
       {/* Bộ sưu tập */}
-      <section className="mx-auto max-w-[1440px] px-3 py-6 sm:px-6 lg:px-8 lg:py-10">
+      <section className="mx-auto max-w-360 px-3 py-6 sm:px-6 lg:px-8 lg:py-10">
         <SectionHeading title="Bộ sưu tập" />
         <ProductGrid products={collectionList} />
       </section>
 
       {/* Tất cả sản phẩm */}
-      <section className="mx-auto max-w-[1440px] px-3 pb-10 sm:px-6 lg:px-8 lg:pb-14">
+      <section className="mx-auto max-w-360 px-3 pb-10 sm:px-6 lg:px-8 lg:pb-14">
         <SectionHeading title="Tất cả sản phẩm" />
         <ProductGrid products={allList} />
         <div className="mt-8 text-center">

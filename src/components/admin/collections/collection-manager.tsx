@@ -126,7 +126,7 @@ export function CollectionManager() {
             reset();
             window.scrollTo({ top: 0 });
           }}
-          className="h-11 rounded-none text-xs uppercase tracking-[0.1em]"
+          className="h-11 rounded-none text-xs uppercase tracking-widest"
         >
           + Thêm bộ sưu tập
         </Button>

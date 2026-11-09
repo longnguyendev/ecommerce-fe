@@ -7,7 +7,7 @@ import { HERO } from "@/data/home";
 export function Hero() {
   return (
     <section className="relative bg-foreground">
-      <div className="relative aspect-[2/3] sm:aspect-auto sm:h-[calc(100vh-100px)] min-h-[400px] sm:min-h-[500px]">
+      <div className="relative aspect-2/3 sm:aspect-auto sm:h-[calc(100vh-100px)] min-h-100 sm:min-h-125">
         {/* mobile portrait */}
         <Image
           src={HERO.imageMobile}

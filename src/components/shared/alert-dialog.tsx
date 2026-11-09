@@ -24,7 +24,7 @@ export function AlertDialog({
         <Button
           autoFocus
           onClick={onClose}
-          className="h-10 rounded-none text-xs uppercase tracking-[0.1em]"
+          className="h-10 rounded-none text-xs uppercase tracking-widest"
         >
           {closeLabel}
         </Button>

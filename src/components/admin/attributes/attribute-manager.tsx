@@ -168,7 +168,7 @@ export function AttributeManager() {
         {attributes.map((a) => (
           <div key={a.id} className="rounded-lg border border-border bg-background p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[13px] uppercase tracking-[0.1em]">{a.name}</h2>
+              <h2 className="text-[13px] uppercase tracking-widest">{a.name}</h2>
               <RowActions onEdit={() => openEdit(a)} onDelete={() => deleteAttr(a)} />
             </div>
             <div className="flex flex-wrap gap-2">

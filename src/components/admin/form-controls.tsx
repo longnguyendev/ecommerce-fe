@@ -16,7 +16,7 @@ export function Field({
 }) {
   return (
     <div className={className}>
-      <label className="mb-1.5 block text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+      <label className="mb-1.5 block text-[11px] uppercase tracking-widest text-muted-foreground">
         {label}
       </label>
       {children}
@@ -24,7 +24,7 @@ export function Field({
   );
 }
 
-const actionButtonClass = "h-10 rounded-none text-xs uppercase tracking-[0.1em]";
+const actionButtonClass = "h-10 rounded-none text-xs uppercase tracking-widest";
 
 /** Nút lưu chuẩn của mọi form/mục quản trị: tự đổi nhãn "Đang lưu…" và khoá khi đang lưu. */
 export function SaveButton({
@@ -139,7 +139,7 @@ export function DataTable({
     <div className="overflow-x-auto rounded-lg border border-border bg-background">
       <table className="w-full text-left text-[13px]">
         <thead>
-          <tr className="border-b border-border text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+          <tr className="border-b border-border text-[11px] uppercase tracking-widest text-muted-foreground">
             {columns.map((c) => (
               <th key={c.label} className={`px-4 py-3 font-normal ${c.right ? "text-right" : ""}`}>
                 {c.label}

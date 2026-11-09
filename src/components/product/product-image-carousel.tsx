@@ -36,7 +36,7 @@ export function ProductImageCarousel({
     "opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 pointer-coarse:opacity-100";
 
   return (
-    <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+    <div className="relative aspect-3/4 overflow-hidden bg-muted">
       <Link href={href} className="absolute inset-0 block" aria-label={name}>
         <div
           className="flex h-full w-full transition-transform duration-500 ease-out"
@@ -58,12 +58,12 @@ export function ProductImageCarousel({
         </div>
 
         {badge ? (
-          <Badge className="absolute left-2 top-2 rounded-none bg-background px-1.5 py-0.5 text-[9.5px] uppercase tracking-[0.1em] text-foreground">
+          <Badge className="absolute left-2 top-2 rounded-none bg-background px-1.5 py-0.5 text-[9.5px] uppercase tracking-widest text-foreground">
             {badge}
           </Badge>
         ) : null}
         {discountPercent ? (
-          <Badge className="absolute right-2 top-2 rounded-none bg-foreground px-1.5 py-0.5 text-[9.5px] uppercase tracking-[0.1em] text-background">
+          <Badge className="absolute right-2 top-2 rounded-none bg-foreground px-1.5 py-0.5 text-[9.5px] uppercase tracking-widest text-background">
             -{discountPercent}%
           </Badge>
         ) : null}
@@ -92,7 +92,7 @@ export function ProductImageCarousel({
           </button>
 
           <div
-            className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[3px] bg-black/15 ${controlVisibility}`}
+            className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 h-0.75 bg-black/15 ${controlVisibility}`}
             role="progressbar"
             aria-valuemin={1}
             aria-valuemax={count}
